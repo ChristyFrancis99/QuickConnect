@@ -100,9 +100,6 @@ The application is organised around route-based pages and shared components. Key
 - Some integrations and AI-related workflows are represented by interface-level or demo interactions. Production deployment will require connecting approved data sources, an AI service, persistent storage, and organisation-managed authentication and permissions.
 - Do not enter real passwords, confidential source code, or sensitive company information into the prototype.
 
-## Development with Lovable
-
-This project was initially scaffolded with [Lovable](https://lovable.dev). Changes synchronised to this GitHub repository can also be continued in the Lovable editor.
 
 ## Project Goal
 
