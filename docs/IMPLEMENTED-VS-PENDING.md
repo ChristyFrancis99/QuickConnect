@@ -44,6 +44,7 @@
 - [x] Knowledge-verification and readiness views with sample readiness percentages.
 - [x] Incoming-member verification progress by approved handover, saved-answer history, and completion states (frontend prototype; no AI grading).
 - [x] Verification answer submission state in the app store.
+- [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
 - [x] Activity feed and settings preference UI.
 - [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, and activity.
 
@@ -90,6 +91,7 @@
 - [ ] Provide explanations, citations, follow-up questions, and weak-area feedback.
 - [ ] Update readiness scores from actual verification results rather than sample percentages.
 - [ ] Give managers a readiness report showing gaps, evidence, and recommended next actions.
+- [x] Add a manager-facing review queue for submitted verification answers, with reviewed/knowledge-gap states and feedback returned to the incoming member (frontend prototype).
 
 ### P3 — Operational readiness
 - [ ] Add loading, empty, error, and retry states for all live workflows.
@@ -118,7 +120,7 @@
 ### Frontend-only priorities (hackathon demo)
 1. [x] Audit and fix role-specific frontend identity and interaction inconsistencies.
 2. [x] Complete the demo handover lifecycle and manager review experience.
-3. [x] Complete incoming-member verification screens and feedback states (per-handover progress and saved-answer states; AI grading remains pending).
+3. [x] Complete incoming-member verification screens and feedback states (per-handover progress, saved-answer states, and manager feedback; AI grading remains pending).
 4. Improve knowledge-source management, analysis, and readiness-report interactions.
 5. Validate responsive layouts, navigation, loading, empty, and error states.
 
@@ -175,6 +177,14 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Manager verification answer review
+- **Completed:** Added a manager/admin review queue for incoming-member verification answers. Managers can inspect the handover, respondent, question, submitted answer, and timestamp; mark an answer reviewed with optional feedback; or flag a knowledge gap with required feedback. Review status and reviewer attribution are stored in localStorage. Incoming members see the manager's decision, comment, reviewer, and timestamp alongside their saved answer history.
+- **Still pending:** AI/evidence-based grading, source citations, automatic knowledge-gap detection, answer editing/resubmission, and readiness scores calculated from reviewed results. This remains a frontend-only demo workflow, not an auditable server review.
+- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched the changed files from GitHub and checked legacy localStorage normalization, answer-review state, manager review actions, required gap feedback, reviewer attribution, and incoming-member feedback rendering. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept the feature frontend-only and manual; the UI explicitly does not claim AI grading. Existing demo authentication, sample data, role navigation, and localStorage persistence remain.
+- **Next action:** Improve the knowledge-source management interactions, keeping all integrations simulated until a separate backend task is approved.
 
 ### 2026-11-08 — Incoming-member verification progress and feedback
 - **Completed:** Incoming members now see an overall verification progress summary and individual progress cards for each approved handover assigned to them. Cards show answered/total counts, completion state, and Start/Continue/Review actions. The verification dialog shows per-handover progress, a saved-answer history with timestamps, a clear current question count, and completion messaging. Answer submissions are checked against an approved handover assigned to that person and duplicate answers are blocked.
