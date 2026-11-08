@@ -54,6 +54,17 @@ type KnowledgeSource = {
   lastSyncedAt: string | null;
 };
 
+type AiFinding = {
+  id: string;
+  projectId: string;
+  title: string;
+  explanation: string;
+  suggestedAction: string;
+  source: string;
+  priority: "High" | "Medium" | "Low";
+  status: "Open" | "In Progress" | "Resolved";
+};
+
 type QuickConnectData = {
   projects: Project[];
   sources: KnowledgeSource[];
@@ -63,6 +74,7 @@ type QuickConnectData = {
   approvals: HandoverApproval[];
   reviews: HandoverReview[];
   answerReviews: AnswerReview[];
+  aiFindings: AiFinding[];
   activities: Activity[];
 };
 
@@ -76,6 +88,7 @@ type QuickConnectApi = QuickConnectData & {
   connectSource: (name: string, actorId: string) => void;
   disconnectSource: (name: string, actorId: string) => void;
   simulateSourceSync: (name: string, actorId: string) => void;
+  updateAiFindingStatus: (id: string, status: AiFinding["status"], actorId: string) => void;
 };
 
 const STORAGE_KEY = "quickconnect.dashboard.v1";
@@ -92,6 +105,48 @@ const initialData: QuickConnectData = {
   approvals: [],
   reviews: [],
   answerReviews: [],
+  aiFindings: [
+    {
+      id: "finding-refund-retry",
+      projectId: "pay",
+      title: "Refund retry logic is missing from shared documentation",
+      explanation: "The sample project notes indicate that retry behavior is described in Alex's branch notes but is not captured in the team's central documentation. A successor may not know how to handle a payment that fails after capture.",
+      suggestedAction: "Ask the payment owner to document the retry sequence, failure conditions, and recovery steps, then link the relevant code or pull request.",
+      source: "Sample GitHub branch notes",
+      priority: "High",
+      status: "Open",
+    },
+    {
+      id: "finding-design-tokens",
+      projectId: "web",
+      title: "Design token decision is not recorded centrally",
+      explanation: "A sample Slack discussion records an agreement about design tokens on Oct 12, but the decision is not reflected in the website project's shared documentation.",
+      suggestedAction: "Add the agreed token names, values, and rationale to the project design guide and link the original discussion.",
+      source: "Sample Slack discussion · Oct 12",
+      priority: "Medium",
+      status: "In Progress",
+    },
+    {
+      id: "finding-certificates",
+      projectId: "mobile",
+      title: "Push notification certificate expiry has no assigned owner",
+      explanation: "The sample mobile project notes mention an upcoming certificate expiry on 2 Dec without naming a responsible maintainer. This could interrupt push notifications if renewal is missed.",
+      suggestedAction: "Assign a certificate owner, record the renewal steps, and add a reminder before the expiry date.",
+      source: "Sample mobile project notes",
+      priority: "High",
+      status: "Open",
+    },
+    {
+      id: "finding-embedding-docs",
+      projectId: "ai",
+      title: "Embedding pipeline documentation is complete",
+      explanation: "The sample knowledge base contains nine pages covering the embedding pipeline. The finding is marked resolved to demonstrate how a previously identified gap can be closed.",
+      suggestedAction: "Keep the documentation owner and last-reviewed date current as the pipeline changes.",
+      source: "Sample Confluence pages",
+      priority: "Low",
+      status: "Resolved",
+    },
+  ],
   activities: initialActivities,
 };
 
@@ -123,6 +178,7 @@ function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
           : initialData.sources,
         reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? savedData.reviews : [],
         answerReviews: Array.isArray((parsed as Record<string, unknown>).answerReviews) ? savedData.answerReviews : [],
+        aiFindings: Array.isArray((parsed as Record<string, unknown>).aiFindings) ? savedData.aiFindings : initialData.aiFindings,
       },
       error: null,
     };
@@ -276,6 +332,17 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
             ? { ...item, status: "Synced", lastSyncedAt }
             : item),
           activities: [activity(actorId, `completed a demo sync for ${name}`), ...current.activities],
+        };
+      });
+    },
+    updateAiFindingStatus: (id, status, actorId) => {
+      setData((current) => {
+        const finding = current.aiFindings.find((item) => item.id === id);
+        if (!finding || finding.status === status) return current;
+        return {
+          ...current,
+          aiFindings: current.aiFindings.map((item) => item.id === id ? { ...item, status } : item),
+          activities: [activity(actorId, `changed an AI analysis finding to ${status.toLowerCase()}`), ...current.activities],
         };
       });
     },
