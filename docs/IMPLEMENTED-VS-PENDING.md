@@ -123,8 +123,8 @@
 2. [x] Complete the demo handover lifecycle and manager review experience.
 3. [x] Complete incoming-member verification screens and feedback states (per-handover progress, saved-answer states, and manager feedback; AI grading remains pending).
 4. [x] Add interactive knowledge-source demo management (local connect/disconnect, simulated refresh, and activity history; no live integrations).
-5. Improve AI-analysis and readiness-report interactions.
-6. Validate responsive layouts, navigation, loading, empty, and error states.
+5. [x] Improve AI-analysis interactions (project filtering, sample finding details, and local status tracking; no live AI processing).
+6. Improve readiness-report interactions and validate responsive layouts, navigation, loading, empty, and error states.
 
 Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
 
@@ -179,6 +179,14 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Interactive AI analysis demo
+- **Completed:** Replaced the static AI Analysis list with a project filter, sample findings, finding explanations, suggested next actions, priority/source labels, and Open / In Progress / Resolved status controls. Added status counts for the selected project. Finding status is saved with the existing browser localStorage data and changes are attributed in the activity feed. Existing saved data without the new findings field falls back to the sample findings.
+- **Still pending:** Live AI inference, source ingestion, source-backed citations, automatic knowledge-gap detection, and a production review pipeline. All displayed findings and source references are illustrative demo content.
+- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched source files from GitHub and checked the project filter, finding detail fields, status transitions, activity attribution, localStorage compatibility fallback, and tracker update. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept this task frontend-only. No live AI service, external source, backend, or authentication flow was added.
+- **Next action:** Improve readiness-report interactions using the existing demo verification and review data, without presenting sample percentages as calculated production readiness.
 
 ### 2026-11-08 — Interactive knowledge-source demo management
 - **Completed:** Replaced the static source cards with local demo connection controls for GitHub, Jira, Confluence, Slack, Figma, and Google Drive. Admins can connect or disconnect a sample source and run a clearly labelled simulated refresh. The UI displays connection status and the last demo refresh time. Source state is persisted in browser localStorage, and connect/disconnect/refresh actions are added to the activity feed. Existing saved data without source state is normalized to the sample defaults.
