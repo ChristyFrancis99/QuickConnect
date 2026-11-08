@@ -39,7 +39,7 @@
 - [x] Team directory with role and status information.
 - [x] Knowledge-source cards for GitHub, Jira, Confluence, Slack, Figma, and Google Drive.
 - [x] Frontend demo controls to connect/disconnect sample sources, simulate a refresh, show last demo refresh time, and record source actions in local activity history (no external service calls).
-- [x] AI-analysis screen with sample knowledge-gap findings.
+- [x] AI-analysis screen with project filtering, sample knowledge-gap findings, expandable explanations and suggested actions, status counts, and Open / In Progress / Resolved tracking (localStorage-backed demo; no live AI).
 - [x] Handover list and create-handover interaction.
 - [x] Handover approval interaction and approval history in local app state.
 - [x] Knowledge-verification and readiness views with sample readiness percentages.
@@ -47,7 +47,7 @@
 - [x] Verification answer submission state in the app store.
 - [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
 - [x] Activity feed and settings preference UI.
-- [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, and activity.
+- [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, AI finding statuses, knowledge-source demo state, and activity.
 
 ## 3. Pending — highest priority
 
