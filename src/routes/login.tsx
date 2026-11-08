@@ -35,8 +35,8 @@ export function LoginPage() {
 
   // State
   const [selectedRole, setSelectedRole] = useState<RoleCategory>("Organisation Admin");
-  const [emailOrUsername, setEmailOrUsername] = useState("christy@quickconnect.io");
-  const [password, setPassword] = useState("quickconnect123");
+  const [emailOrUsername, setEmailOrUsername] = useState("christy@quickflow.io");
+  const [password, setPassword] = useState("quickflow123");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export function LoginPage() {
     const member = personById(def.defaultMemberId);
     if (member) {
       setEmailOrUsername(member.email);
-      setPassword("quickconnect123");
+      setPassword("quickflow123");
     }
   };
 
@@ -191,7 +191,7 @@ export function LoginPage() {
                 type="text"
                 autoComplete="username"
                 required
-                placeholder="name@quickconnect.io or username"
+                placeholder="name@quickflow.io or username"
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
                 className="w-full rounded-xl border border-[#D8D2C8] bg-white/95 px-4 py-3.5 text-sm text-[#252525] placeholder:text-gray-400 shadow-sm transition focus:border-[#A98A52] focus:outline-none focus:ring-2 focus:ring-[#C2A064]/20"
@@ -390,7 +390,7 @@ export function LoginPage() {
                   <input
                     type="email"
                     required
-                    placeholder="e.g. christy@quickconnect.io"
+                    placeholder="e.g. christy@quickflow.io"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     className="mt-1 w-full rounded-full border border-gray-200 px-3.5 py-2 text-xs focus:border-[#252525] focus:outline-none"
@@ -460,7 +460,7 @@ export function LoginPage() {
 
             <div className="mt-3">
               <h3 className="text-lg font-bold text-[#252525]">
-                Request QuickConnect Access
+                Request QuickFlow Access
               </h3>
               <p className="mt-0.5 text-xs text-gray-500">
                 Routed to Christy Francis (Administrator).
@@ -604,7 +604,7 @@ export function LoginPage() {
             </div>
 
             <p className="mt-2.5 text-[11px] text-gray-500">
-              Select an authorized QuickConnect team account:
+              Select an authorized QuickFlow team account:
             </p>
 
             <div className="mt-3 space-y-1.5">
