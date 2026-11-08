@@ -203,9 +203,9 @@ export function SectionView({ slug }: { slug: string }) {
               ))}
               {h.status === "Approved" ? (
                 <span className="text-xs text-muted-foreground">Approved by {personById(approvals.find((approval) => approval.handoverId === h.id)?.approvedBy ?? "christy").name}</span>
-              ) : (h.status === "Rejected" ? (
+              ) : h.status === "Rejected" ? (
                 <span className="text-xs text-muted-foreground">Rejected</span>
-              ) : (roleCategory === "Project Manager" || roleCategory === "Organisation Admin") ? (
+              ) : roleCategory === "Project Manager" || roleCategory === "Organisation Admin" ? (
                 <div className="w-full space-y-2">
                   <Textarea
                     value={reviewDrafts[h.id] ?? ""}
@@ -257,7 +257,9 @@ export function SectionView({ slug }: { slug: string }) {
                     }}>Edit and resubmit</Button>
                   )}
                 </div>
-              ) : <span className="text-xs text-muted-foreground">Awaiting manager review</span>))}
+              ) : (
+                <span className="text-xs text-muted-foreground">Awaiting manager review</span>
+              )}
             </Card>
           ))}
         </div>
