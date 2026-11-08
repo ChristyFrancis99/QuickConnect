@@ -13,8 +13,9 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, activities, verification, answers, approvals, reviews, approveHandover, reviewHandover, resubmitHandover } = useQuickConnect();
+  const { projects, handovers, activities, verification, answers, approvals, reviews, answerReviews, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
+  const [answerReviewDrafts, setAnswerReviewDrafts] = useState<Record<string, string>>({});
   const [editingHandover, setEditingHandover] = useState<string | null>(null);
   const [knowledgeDrafts, setKnowledgeDrafts] = useState<Record<string, { question: string; answer: string }[]>>({});
   const allowedSections: Record<string, string[]> = {
@@ -185,15 +186,69 @@ export function SectionView({ slug }: { slug: string }) {
         );
       }
       return (
-        <div className="space-y-3">
-          {verification.map((v) => (
-            <Card key={v.who} className="flex items-center gap-4">
-              <Avatar id={v.who} size={44} />
-              <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
-              <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
-              <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>
-            </Card>
-          ))}
+        <div className="space-y-5">
+          <section className="space-y-3">
+            <div>
+              <h3 className="font-semibold">Submitted verification answers</h3>
+              <p className="text-sm text-muted-foreground">Review each response, or flag an answer that reveals a knowledge gap. This is a manual demo review, not AI grading.</p>
+            </div>
+            {answers.length === 0 ? (
+              <Card><p className="font-medium">No submitted answers yet</p><p className="mt-1 text-sm text-muted-foreground">Incoming members' responses will appear here after they complete verification questions.</p></Card>
+            ) : answers.map((answer) => {
+              const handover = handovers.find((item) => item.id === answer.handoverId);
+              const latestReview = answerReviews.filter((item) => item.answerId === answer.id).slice(-1)[0];
+              const canReview = !latestReview;
+              return (
+                <Card key={answer.id} className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2"><Avatar id={answer.personId} size={34} /><div><p className="text-sm font-semibold">{personById(answer.personId).name}</p><p className="text-xs text-muted-foreground">{handover?.project ?? "Project handover"} · Submitted {new Date(answer.submittedAt).toLocaleString()}</p></div></div>
+                    {latestReview ? (
+                      <Pill tone={latestReview.action === "knowledge_gap" ? "warning" : "success"}>{latestReview.action === "knowledge_gap" ? "Knowledge gap flagged" : "Reviewed"}</Pill>
+                    ) : <Pill tone="accent">Needs review</Pill>}
+                  </div>
+                  <div className="space-y-1"><p className="text-xs font-medium text-muted-foreground">Question</p><p className="text-sm">{answer.question}</p></div>
+                  <div className="space-y-1 rounded-xl bg-muted p-3"><p className="text-xs font-medium text-muted-foreground">Incoming member's answer</p><p className="text-sm">{answer.answer}</p></div>
+                  {latestReview ? (
+                    <div className="rounded-xl border border-border p-3 text-sm">
+                      <p className="font-medium">{latestReview.action === "knowledge_gap" ? "Manager feedback — knowledge gap" : "Manager review complete"}</p>
+                      {latestReview.comment && <p className="mt-1 text-muted-foreground">{latestReview.comment}</p>}
+                      <p className="mt-2 text-xs text-muted-foreground">Reviewed by {personById(latestReview.reviewerId).name} · {new Date(latestReview.reviewedAt).toLocaleString()}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Textarea
+                        rows={2}
+                        value={answerReviewDrafts[answer.id] ?? ""}
+                        onChange={(event) => setAnswerReviewDrafts((current) => ({ ...current, [answer.id]: event.target.value }))}
+                        placeholder="Optional feedback for the incoming member. Required when flagging a knowledge gap."
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" onClick={() => {
+                          reviewAnswer(answer.id, user.id, "reviewed", answerReviewDrafts[answer.id] ?? "");
+                          setAnswerReviewDrafts((current) => ({ ...current, [answer.id]: "" }));
+                        }}>Mark reviewed</Button>
+                        <Button size="sm" disabled={!(answerReviewDrafts[answer.id] ?? "").trim()} onClick={() => {
+                          reviewAnswer(answer.id, user.id, "knowledge_gap", answerReviewDrafts[answer.id] ?? "");
+                          setAnswerReviewDrafts((current) => ({ ...current, [answer.id]: "" }));
+                        }}>Flag knowledge gap</Button>
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
+          </section>
+          <section className="space-y-3">
+            <h3 className="font-semibold">Sample readiness indicators</h3>
+            {verification.map((v) => (
+              <Card key={v.who} className="flex items-center gap-4">
+                <Avatar id={v.who} size={44} />
+                <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
+                <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
+                <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>
+              </Card>
+            ))}
+          </section>
         </div>
       );
     case "readiness":
