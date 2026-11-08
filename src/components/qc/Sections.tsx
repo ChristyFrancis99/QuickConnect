@@ -10,8 +10,18 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
-  const { user } = useAuth();
+  const { user, roleCategory } = useAuth();
   const { projects, handovers, activities, verification, approvals, approveHandover } = useQuickConnect();
+  const allowedSections: Record<string, string[]> = {
+    "Outgoing Member": ["projects", "handovers", "activity"],
+    "Incoming Member": ["projects", "verification", "activity"],
+    "Project Manager": ["projects", "team", "handovers", "verification", "readiness", "activity"],
+    "Organisation Admin": ["projects", "team", "sources", "analysis", "handovers", "verification", "readiness", "activity", "settings"],
+  };
+  if (!allowedSections[roleCategory]?.includes(slug)) {
+    return <Card><p className="font-semibold">This section is not available for your demo role.</p><p className="mt-1 text-sm text-muted-foreground">Switch to a role with access to continue.</p></Card>;
+  }
+
   switch (slug) {
     case "projects":
       return (
@@ -65,8 +75,8 @@ export function SectionView({ slug }: { slug: string }) {
     case "handovers":
       return (
         <div className="space-y-3">
-          <Button onClick={ui.openHandover}>Create New Handover</Button>
-          {handovers.map((h) => (
+          {(roleCategory === "Outgoing Member" || roleCategory === "Organisation Admin") && <Button onClick={ui.openHandover}>Create New Handover</Button>}
+          {handovers.filter((h) => roleCategory !== "Outgoing Member" || h.from === user.id).map((h) => (
             <Card key={h.id} className="flex flex-wrap items-center gap-4">
               <FileText className="h-5 w-5 text-primary" />
               <div className="min-w-0 flex-1"><p className="font-semibold">{h.project}</p><p className="text-xs text-muted-foreground">{h.date} {h.month} · {h.time}</p></div>
@@ -75,7 +85,7 @@ export function SectionView({ slug }: { slug: string }) {
               {h.status === "Approved" ? (
                 <span className="text-xs text-muted-foreground">Approved by {personById(approvals.find((approval) => approval.handoverId === h.id)?.approvedBy ?? "christy").name}</span>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => approveHandover(h.id, user.id)}>Approve</Button>
+                {(roleCategory === "Project Manager" || roleCategory === "Organisation Admin") && <Button size="sm" variant="outline" onClick={() => approveHandover(h.id, user.id)}>Approve</Button>}
               )}
             </Card>
           ))}
@@ -85,7 +95,7 @@ export function SectionView({ slug }: { slug: string }) {
     case "readiness":
       return (
         <div className="space-y-3">
-          {verification.map((v) => (
+          {verification.filter((v) => roleCategory !== "Incoming Member" || v.who === user.id).map((v) => (
             <Card key={v.who} className="flex items-center gap-4">
               <Avatar id={v.who} size={44} />
               <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={`var(--${readinessTone(v.readiness)})`} /></div>
