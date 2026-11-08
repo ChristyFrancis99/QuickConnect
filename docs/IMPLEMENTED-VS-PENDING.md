@@ -49,7 +49,7 @@
 ### P0 — Production foundation
 - [ ] Select and integrate a production authentication provider.
 - [ ] Implement secure sessions, password handling, account recovery, and real Google OAuth if required.
-- [~] Database foundation design documented in [DATABASE-DESIGN.md](./DATABASE-DESIGN.md); actual provider provisioning, schema/migrations, and connection remain pending through the approved Lovable workflow.
+- [~] Database foundation design documented in [DATABASE-DESIGN.md](./DATABASE-DESIGN.md); actual provider selection, provisioning, schema/migrations, and connection remain pending.
 - [ ] Replace localStorage as the source of truth with server-side persistence.
 - [ ] Enforce role-based access control on the server/API, not only in the UI.
 - [ ] Add organisation and project data isolation.
@@ -72,7 +72,7 @@
 - [ ] Store source references and citations for every extracted claim.
 - [ ] Detect missing documentation, conflicting claims, stale knowledge, and single-person dependencies.
 - [ ] Add evidence-grounded question answering with citations.
-- [ ] Keep AI calls server-side through the Lovable-managed gateway; never expose secret keys in browser code.
+- [ ] Keep AI calls server-side through the selected AI provider; never expose secret keys in browser code.
 - [ ] Add evaluation tests for extraction quality, answer correctness, citations, and uncertainty handling.
 
 ### P2 — Handover and verification completion
@@ -135,7 +135,7 @@ Follow this order unless a technical dependency requires a change:
 2. Do not mark a task complete just because a page or button exists.
 3. For integrations, verify a real end-to-end request and its failure path.
 4. Add or update tests where practical.
-5. Preserve existing working UI and follow `AGENTS.md` (especially Lovable-managed database, secrets, generated files, and AI gateway rules).
+5. Preserve existing working UI and follow `AGENTS.md`, especially its guidance on secrets, generated files, and server-only operations.
 
 ### Before ending, switching tools, or running out of credits
 1. Update the status checkbox for every task changed in this session.
@@ -161,13 +161,21 @@ Copy this template into the session log after each build session:
 
 ## 7. Session log
 
+### 2026-11-08 — Remove Lovable-specific tooling and telemetry
+- **Completed:** Replaced the Lovable Vite wrapper with the standard Vite + TanStack Start + React + Tailwind + Nitro configuration; removed the Lovable-only dev dependency and project metadata; removed editor-specific error telemetry; kept the existing app error boundary and server error handling; replaced the generated Lovable-specific repository instructions with neutral project guidance.
+- **Still pending:** Build, lint, tests, and local runtime validation have not been run in this session. The database remains a design only; no provider has been selected or connected.
+- **Files changed:** `vite.config.ts`, `package.json`, `package-lock.json`, `src/routes/__root.tsx`, `src/lib/lovable-error-reporting.ts` (deleted), `.lovable/project.json` (deleted), `AGENTS.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** GitHub source edits only; no local install/build/lint/test was available. Confirmed the Lovable-specific package and metadata references were removed from the files edited.
+- **Decisions / blockers:** Existing KnowFlow screens, routes, stores, and demo workflows were left unchanged. The Vite config now uses the framework's standard plugins; runtime/build validation is still required before considering the removal fully verified.
+- **Next action:** Clone/pull `main`, run `npm ci`, `npm run build`, `npm run lint`, and `npm test`; fix any configuration issues before selecting a database provider.
+
 ### 2026-11-08 — Database foundation design prepared
-- **Completed:** Inspected `AGENTS.md`, the package manifest, Lovable project metadata, and the current auth/data stores. Added `docs/DATABASE-DESIGN.md` with the proposed tenant-aware relational model, relationships, security/RLS requirements, indexes, migration sequence, and acceptance criteria.
-- **Still pending:** No database was provisioned or connected. The repository instructions explicitly prohibit hand-editing `supabase/migrations/` and `drizzle/` and require database changes through Lovable. No Lovable MCP action is connected in this session, so provider confirmation, schema creation, RLS policies, generated types, and server-side persistence cannot safely be completed here. The current app remains localStorage/demo-backed.
+- **Completed:** Inspected `AGENTS.md`, the package manifest, project metadata, and the current auth/data stores. Added `docs/DATABASE-DESIGN.md` with the proposed tenant-aware relational model, relationships, security/RLS requirements, indexes, migration sequence, and acceptance criteria.
+- **Still pending:** No database was provisioned or connected. At that time, repository instructions prohibited hand-editing database migrations and required changes through the connected platform workflow. Provider confirmation, schema creation, RLS policies, generated types, and server-side persistence were not completed. The current app remains localStorage/demo-backed.
 - **Files changed:** `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** GitHub source inspection only; build, lint, and tests not run. Documentation write confirmed by GitHub commit response.
-- **Decisions / blockers:** Do not create database migrations or select a provider by assumption. Use the Lovable project workflow to confirm the managed provider and apply the schema. No application UI or runtime code was changed.
-- **Next action:** Open the connected KnowFlow project in Lovable and ask it to provision/confirm the managed database, implement the schema in `docs/DATABASE-DESIGN.md`, and configure tenant/project RLS. Then verify cross-organisation access denial before wiring the frontend.
+- **Decisions / blockers:** Do not create database migrations or select a provider by assumption. Select a database provider and apply the schema using its supported migration workflow. No application UI or runtime code was changed.
+- **Next action:** Select and provision a managed database, implement the schema in `docs/DATABASE-DESIGN.md`, and configure tenant/project RLS. Then verify cross-organisation access denial before wiring the frontend.
 
 ### 2026-11-08 — Documentation baseline created
 - **Completed:** Inspected the current repository structure, package dependencies, route modules, role/auth store, sample data, dashboard, section views, and local app data store. Created this tracker and the project overview.
