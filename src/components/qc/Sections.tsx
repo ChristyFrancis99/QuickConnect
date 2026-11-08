@@ -358,18 +358,110 @@ export function SectionView({ slug }: { slug: string }) {
           </section>
         </div>
       );
-    case "readiness":
+    case "readiness": {
+      const incomingMemberIds = [...new Set(handovers.map((handover) => handover.to))];
+      const approvedHandovers = handovers.filter((handover) => handover.status === "Approved");
+      const pendingHandovers = handovers.filter((handover) =>
+        handover.status === "Pending approval" || handover.status === "Changes requested",
+      );
+      const rejectedHandovers = handovers.filter((handover) => handover.status === "Rejected");
+      const reviewedAnswerIds = new Set(answerReviews.map((review) => review.answerId));
+      const knowledgeGapAnswerIds = new Set(
+        answerReviews.filter((review) => review.action === "knowledge_gap").map((review) => review.answerId),
+      );
+      const unreviewedAnswerCount = answers.filter((answer) => !reviewedAnswerIds.has(answer.id)).length;
+      const memberReadiness = incomingMemberIds.map((memberId) => {
+        const memberHandovers = approvedHandovers.filter((handover) => handover.to === memberId);
+        const memberHandoverIds = new Set(memberHandovers.map((handover) => handover.id));
+        const expectedQuestions = memberHandovers.reduce((total, handover) => total + handover.knowledge.length, 0);
+        const memberAnswers = answers.filter((answer) =>
+          answer.personId === memberId && memberHandoverIds.has(answer.handoverId),
+        );
+        const completedQuestions = Math.min(memberAnswers.length, expectedQuestions);
+        const memberAnswerIds = new Set(memberAnswers.map((answer) => answer.id));
+        const reviewedCount = memberAnswers.filter((answer) => reviewedAnswerIds.has(answer.id)).length;
+        const gapCount = memberAnswers.filter((answer) => knowledgeGapAnswerIds.has(answer.id)).length;
+        const awaitingHandoverCount = handovers.filter((handover) =>
+          handover.to === memberId && (handover.status === "Pending approval" || handover.status === "Changes requested"),
+        ).length;
+        const rejectedCount = handovers.filter((handover) => handover.to === memberId && handover.status === "Rejected").length;
+        return {
+          memberId,
+          memberHandovers,
+          expectedQuestions,
+          completedQuestions,
+          progress: expectedQuestions ? Math.round((completedQuestions / expectedQuestions) * 100) : 0,
+          reviewedCount,
+          gapCount,
+          awaitingHandoverCount,
+          rejectedCount,
+          unreviewedCount: memberAnswers.filter((answer) => !reviewedAnswerIds.has(answer.id)).length,
+        };
+      });
       return (
-        <div className="space-y-3">
-          {verification.map((v) => (
-            <Card key={v.who} className="flex items-center gap-4">
-              <Avatar id={v.who} size={44} />
-              <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
-              <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
-            </Card>
-          ))}
+        <div className="space-y-4">
+          <Card className="space-y-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold">Knowledge transfer readiness</p>
+                <p className="text-sm text-muted-foreground">Progress is calculated from approved handovers, submitted answers, and manager review records in this demo.</p>
+              </div>
+              <Pill tone="accent">Demo metrics</Pill>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Approved handovers</p><p className="text-xl font-semibold">{approvedHandovers.length}</p></div>
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Awaiting approval / changes</p><p className="text-xl font-semibold">{pendingHandovers.length}</p></div>
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Answers awaiting review</p><p className="text-xl font-semibold">{unreviewedAnswerCount}</p></div>
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Knowledge gaps flagged</p><p className="text-xl font-semibold">{knowledgeGapAnswerIds.size}</p></div>
+            </div>
+            {rejectedHandovers.length > 0 && <p className="text-xs text-muted-foreground">{rejectedHandovers.length} handover(s) have been rejected and need follow-up before knowledge transfer can proceed.</p>}
+          </Card>
+          <div className="space-y-3">
+            <div>
+              <h3 className="font-semibold">Incoming member progress</h3>
+              <p className="text-xs text-muted-foreground">Completion = submitted answers ÷ questions in approved handovers. It is not an AI-graded readiness score.</p>
+            </div>
+            {memberReadiness.length === 0 ? (
+              <Card><p className="font-medium">No incoming handovers yet</p><p className="mt-1 text-sm text-muted-foreground">Member progress will appear here once handovers are created.</p></Card>
+            ) : memberReadiness.map((member) => (
+              <Card key={member.memberId} className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Avatar id={member.memberId} size={42} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{personById(member.memberId).name}</p>
+                    <p className="text-xs text-muted-foreground">{member.memberHandovers.length} approved handover(s) · {member.completedQuestions}/{member.expectedQuestions} questions answered</p>
+                  </div>
+                  {member.expectedQuestions > 0
+                    ? <Pill tone={member.progress === 100 ? "success" : member.progress > 0 ? "warning" : "danger"}>{member.progress}% complete</Pill>
+                    : <Pill tone="neutral">Not started</Pill>}
+                </div>
+                <Bar value={member.progress} color={"var(--" + (member.progress === 100 ? "chart-2" : "chart-1") + ")"} />
+                <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                  <div className="rounded-md bg-muted p-2"><span className="text-muted-foreground">Reviewed</span><p className="mt-1 font-semibold">{member.reviewedCount}</p></div>
+                  <div className="rounded-md bg-muted p-2"><span className="text-muted-foreground">Knowledge gaps</span><p className="mt-1 font-semibold">{member.gapCount}</p></div>
+                  <div className="rounded-md bg-muted p-2"><span className="text-muted-foreground">Awaiting review</span><p className="mt-1 font-semibold">{member.unreviewedCount}</p></div>
+                  <div className="rounded-md bg-muted p-2"><span className="text-muted-foreground">Handover actions</span><p className="mt-1 font-semibold">{member.awaitingHandoverCount + member.rejectedCount}</p></div>
+                </div>
+                {(member.gapCount > 0 || member.awaitingHandoverCount > 0 || member.rejectedCount > 0) && (
+                  <div className="rounded-lg border border-border p-3 text-sm">
+                    <p className="font-medium">Follow-up needed</p>
+                    <ul className="mt-1 list-inside list-disc text-muted-foreground">
+                      {member.gapCount > 0 && <li>{member.gapCount} answer(s) flagged as knowledge gaps</li>}
+                      {member.awaitingHandoverCount > 0 && <li>{member.awaitingHandoverCount} handover(s) awaiting approval or resubmission</li>}
+                      {member.rejectedCount > 0 && <li>{member.rejectedCount} rejected handover(s)</li>}
+                    </ul>
+                  </div>
+                )}
+                <div className="flex justify-end">
+                  <Button size="sm" variant="outline" onClick={() => ui.openVerify(member.memberId)}>View verification</Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">These are local demo metrics based on browser data. They do not assess answer correctness, source evidence, or production readiness.</p>
         </div>
       );
+    }
     case "activity":
       return (
         <div className="space-y-3">
