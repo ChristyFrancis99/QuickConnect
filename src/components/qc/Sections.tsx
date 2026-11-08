@@ -378,7 +378,6 @@ export function SectionView({ slug }: { slug: string }) {
           answer.personId === memberId && memberHandoverIds.has(answer.handoverId),
         );
         const completedQuestions = Math.min(memberAnswers.length, expectedQuestions);
-        const memberAnswerIds = new Set(memberAnswers.map((answer) => answer.id));
         const reviewedCount = memberAnswers.filter((answer) => reviewedAnswerIds.has(answer.id)).length;
         const gapCount = memberAnswers.filter((answer) => knowledgeGapAnswerIds.has(answer.id)).length;
         const awaitingHandoverCount = handovers.filter((handover) =>
