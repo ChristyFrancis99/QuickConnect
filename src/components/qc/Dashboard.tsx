@@ -17,12 +17,13 @@ export function DashboardMain() {
   const pendingHandovers = handovers.filter((item) => item.status !== "Approved").length;
   const paymentHandover = handovers.find((item) => item.projectId === "pay");
   const paymentAnswers = paymentHandover ? answers.filter((item) => item.handoverId === paymentHandover.id).length : 0;
-  const stats = [
-    { value: String(projects.length).padStart(2, "0"), label: "Active Projects", icon: FolderKanban, section: "projects" },
-    { value: String(people.length).padStart(2, "0"), label: "Team Members", icon: Users, section: "team" },
-    { value: String(pendingHandovers).padStart(2, "0"), label: "Pending Handovers", icon: ClipboardList, section: "handovers" },
-    { value: `${averageReadiness}%`, label: "Average Readiness", icon: GraduationCap, section: "readiness" },
+  const roleStats = [
+    { value: String(projects.length).padStart(2, "0"), label: "Active Projects", icon: FolderKanban, section: "projects", roles: ["Outgoing Member", "Incoming Member", "Project Manager", "Organisation Admin"] },
+    { value: String(people.length).padStart(2, "0"), label: "Team Members", icon: Users, section: "team", roles: ["Project Manager", "Organisation Admin"] },
+    { value: String(pendingHandovers).padStart(2, "0"), label: "Pending Handovers", icon: ClipboardList, section: "handovers", roles: ["Outgoing Member", "Project Manager", "Organisation Admin"] },
+    { value: `${averageReadiness}%`, label: "Average Readiness", icon: GraduationCap, section: "readiness", roles: ["Project Manager", "Organisation Admin"] },
   ] as const;
+  const stats = roleStats.filter((item) => item.roles.includes(roleCategory));
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-5 rounded-3xl bg-primary p-6 text-primary-foreground shadow-soft">
@@ -30,8 +31,8 @@ export function DashboardMain() {
           <h2 className="text-xl font-semibold sm:text-2xl">Good to see you, {user.name.split(" ")[0]}!</h2>
           <p className="mt-1 max-w-md text-sm opacity-90">{handovers.length} handovers are due this month. Capture what your team knows before people move on, so work keeps moving.</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button variant="secondary" className="rounded-xl bg-card text-foreground hover:bg-card/90" onClick={ui.openHandover}>Create New Handover</Button>
-            <Button variant="ghost" className="rounded-xl text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground" onClick={() => ui.openVerify()}>Start verification</Button>
+            {(roleCategory === "Outgoing Member" || roleCategory === "Organisation Admin") && <Button variant="secondary" className="rounded-xl bg-card text-foreground hover:bg-card/90" onClick={ui.openHandover}>Create New Handover</Button>}
+            {(roleCategory === "Incoming Member" || roleCategory === "Project Manager" || roleCategory === "Organisation Admin") && <Button variant="ghost" className="rounded-xl text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground" onClick={() => ui.openVerify(roleCategory === "Incoming Member" ? user.id : undefined)}>Start verification</Button>}
           </div>
         </div>
         <div className="hidden -space-x-4 sm:flex">
@@ -115,8 +116,8 @@ export function DashboardMain() {
             ))}
           </ol>
         </Card>
-        <Card>
-          <SectionHead title="Knowledge Verification" action="Start session" onAction={() => ui.openVerify()} />
+        {(roleCategory === "Incoming Member" || roleCategory === "Project Manager" || roleCategory === "Organisation Admin") && <Card>
+          <SectionHead title="Knowledge Verification" action="Start session" onAction={() => ui.openVerify(roleCategory === "Incoming Member" ? user.id : undefined)} />
           <div className="space-y-4">
             {verification.map((v) => {
               const p = personById(v.who);
@@ -133,6 +134,7 @@ export function DashboardMain() {
             })}
           </div>
         </Card>
+        </Card>}
         <Card>
           <SectionHead title="AI Insights" />
           <div className="space-y-2.5">
