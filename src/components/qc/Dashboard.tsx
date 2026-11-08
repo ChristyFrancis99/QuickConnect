@@ -12,8 +12,8 @@ export function DashboardMain() {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
   const { projects, handovers, verification, answers } = useQuickConnect();
-  const avg = Math.round(projects.reduce((s, p) => s + p.progress, 0) / projects.length);
-  const averageReadiness = Math.round(verification.reduce((sum, item) => sum + item.readiness, 0) / verification.length);
+  const avg = projects.length ? Math.round(projects.reduce((s, p) => s + p.progress, 0) / projects.length) : 0;
+  const averageReadiness = verification.length ? Math.round(verification.reduce((sum, item) => sum + item.readiness, 0) / verification.length) : 0;
   const pendingHandovers = handovers.filter((item) => item.status !== "Approved").length;
   const paymentHandover = handovers.find((item) => item.projectId === "pay");
   const paymentAnswers = paymentHandover ? answers.filter((item) => item.handoverId === paymentHandover.id).length : 0;
@@ -54,7 +54,7 @@ export function DashboardMain() {
           <h3 className="font-semibold">Project Overview</h3>
           <span className="text-sm font-semibold">{projects.length} projects</span>
         </div>
-        <div className="grid items-center gap-6 md:grid-cols-[200px_1fr]">
+        {projects.length === 0 ? <p className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">No project data is available yet. Projects will appear here when added to the workspace.</p> : <div className="grid items-center gap-6 md:grid-cols-[200px_1fr]">
           <div className="relative mx-auto h-[200px] w-[200px]">
             <ResponsiveContainer>
               <PieChart>
@@ -79,7 +79,7 @@ export function DashboardMain() {
               </button>
             ))}
           </div>
-        </div>
+        </div>} 
       </Card>
 
       <div className="grid gap-5 md:grid-cols-2">
