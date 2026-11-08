@@ -125,7 +125,7 @@
 4. [x] Add interactive knowledge-source demo management (local connect/disconnect, simulated refresh, and activity history; no live integrations).
 5. [x] Improve AI-analysis interactions (project filtering, sample finding details, and local status tracking; no live AI processing).
 6. [x] Improve readiness-report interactions using submitted answers, manager reviews, knowledge-gap flags, and handover lifecycle states (local demo calculations; not production readiness).
-7. Validate responsive layouts, navigation, loading, empty, and error states.
+7. [~] Add defensive mobile layout and empty-data handling to the main dashboard and section views; visual viewport testing, full navigation walkthrough, and live loading/error-path checks remain pending.
 
 Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
 
@@ -180,6 +180,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Responsive layout and empty-state hardening
+- **Completed:** Made the app header controls and main content width more resilient on narrow screens; reduced the smallest-screen main padding; added clear empty states for projects, team members, knowledge sources, handovers, and activity; made activity and handover content wrap safely; guarded dashboard average calculations when project or verification collections are empty; added a dashboard empty-project state.
+- **Still pending:** A real browser/device viewport pass (small phone, tablet, desktop), keyboard/mobile navigation walkthrough, and exercising storage failure/loading behavior end to end. The app's existing localStorage load/save failure feedback remains the only current storage error handling; no live backend loading/retry states exist.
+- **Files changed:** `src/components/qc/AppShell.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/Dashboard.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Source-level inspection of the responsive classes, empty-state branches, zero-length guards, and existing role navigation. Build, lint, automated tests, and browser viewport checks were not run because no repository runtime/browser was available in this session.
+- **Decisions / blockers:** Preserved role-specific navigation and the demo data model. Did not introduce backend work or claim visual testing was completed.
+- **Next action:** Run the project locally and test 360px, 768px, and desktop widths; walk through each role's navigation and storage failure paths.
+
 
 ### 2026-11-08 — Interactive readiness report
 - **Completed:** Replaced fixed readiness percentages on the Readiness Reports page with calculations from approved handovers, expected questions, submitted answers, manager review records, and knowledge-gap flags. Added workspace summary counts for approved handovers, handovers awaiting approval/changes, answers awaiting review, and flagged knowledge gaps. Added per-incoming-member progress, reviewed/unreviewed answer counts, knowledge-gap counts, outstanding handover actions, and a shortcut to the member's verification view.
