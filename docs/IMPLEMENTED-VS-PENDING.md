@@ -1,4 +1,4 @@
-# KnowFlow — Implemented vs Pending
+# QuickFlow — Implemented vs Pending
 
 > **This is the project handover log for developers and AI coding tools.** Update it after every meaningful implementation session so work can resume even if an AI tool runs out of credits or a session ends.
 
@@ -181,6 +181,15 @@ Copy this template into the session log after each build session:
 
 ## 7. Session log
 
+### 2026-11-08 — Rename product to QuickFlow and responsive source audit
+- **Completed:** Updated visible product branding and documentation from the previous project name to QuickFlow. Updated the app sidebar, sign-out message, login copy, demo email addresses, sample website project name, README, project overview, database design, and this tracker. Kept repository paths, internal QuickConnect code identifiers, and the existing localStorage key unchanged to avoid breaking imports or existing browser demo data. During the responsive source audit, changed the AI Analysis status summary from three columns at every width to one column on narrow screens and three columns from the small breakpoint upward.
+- **Still pending:** Real visual viewport testing at 360px, 768px, and desktop widths; full navigation and role walkthrough; additional responsive fixes based on screenshots/runtime behaviour. Responsive work remains in progress.
+- **Files changed:** `README.md`, `docs/OVERVIEW.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`, `src/components/qc/AppShell.tsx`, `src/routes/login.tsx`, `src/lib/data.ts`, `src/components/qc/Sections.tsx`.
+- **Checks:** Re-fetched changed files from GitHub and inspected the updated branding strings and responsive grid class. Build, lint, automated tests, and browser viewport checks were not run.
+- **Decisions / blockers:** QuickConnect remains the GitHub repository name and internal store/hook identifiers remain unchanged; these are implementation/repository identifiers, not displayed product branding. The existing login background asset filename also remains unchanged so the current image reference is not broken.
+- **Next action:** Pull the changes locally, verify login and role switching with the updated demo emails, then test the app at 360px, 768px, and desktop widths and report any overflow or layout breakage.
+
+
 ### 2026-11-08 — Responsive layout and empty-state hardening
 - **Completed:** Made the app header controls and main content width more resilient on narrow screens; reduced the smallest-screen main padding; added clear empty states for projects, team members, knowledge sources, handovers, and activity; made activity and handover content wrap safely; guarded dashboard average calculations when project or verification collections are empty; added a dashboard empty-project state.
 - **Still pending:** A real browser/device viewport pass (small phone, tablet, desktop), keyboard/mobile navigation walkthrough, and exercising storage failure/loading behavior end to end. The app's existing localStorage load/save failure feedback remains the only current storage error handling; no live backend loading/retry states exist.
@@ -281,7 +290,7 @@ Copy this template into the session log after each build session:
 - **Still pending:** Build, lint, tests, and local runtime validation have not been run in this session. The database remains a design only; no provider has been selected or connected.
 - **Files changed:** `vite.config.ts`, `package.json`, `package-lock.json`, `src/routes/__root.tsx`, editor telemetry module (deleted), editor project metadata (deleted), `AGENTS.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** GitHub source edits only; no local install/build/lint/test was available. Confirmed the platform-specific package and metadata references were removed from the files edited.
-- **Decisions / blockers:** Existing KnowFlow screens, routes, stores, and demo workflows were left unchanged. The Vite config now uses the framework's standard plugins; runtime/build validation is still required before considering the removal fully verified.
+- **Decisions / blockers:** Existing QuickFlow screens, routes, stores, and demo workflows were left unchanged. The Vite config now uses the framework's standard plugins; runtime/build validation is still required before considering the removal fully verified.
 - **Next action:** Clone/pull `main`, run `npm ci`, `npm run build`, `npm run lint`, and `npm test`; fix any configuration issues before selecting a database provider.
 
 ### 2026-11-08 — Database foundation design prepared
