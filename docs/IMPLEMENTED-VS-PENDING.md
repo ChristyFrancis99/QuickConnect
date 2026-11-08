@@ -124,7 +124,7 @@
 3. [x] Complete incoming-member verification screens and feedback states (per-handover progress, saved-answer states, and manager feedback; AI grading remains pending).
 4. [x] Add interactive knowledge-source demo management (local connect/disconnect, simulated refresh, and activity history; no live integrations).
 5. Improve AI-analysis and readiness-report interactions.
-5. Validate responsive layouts, navigation, loading, empty, and error states.
+6. Validate responsive layouts, navigation, loading, empty, and error states.
 
 Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
 
