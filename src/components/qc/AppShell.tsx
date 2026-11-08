@@ -15,6 +15,13 @@ import { UICtx, type UIApi } from "./ui-context";
 import { Dialogs, type DialogState } from "./dialogs";
 import { ActivityPanel } from "./Dashboard";
 
+const roleNavigation: Record<string, string[]> = {
+  "Outgoing Member": ["dashboard", "projects", "handovers", "activity"],
+  "Incoming Member": ["dashboard", "projects", "verification", "activity"],
+  "Project Manager": ["dashboard", "projects", "team", "handovers", "verification", "readiness", "activity"],
+  "Organisation Admin": navItems.map((item) => item.slug),
+};
+
 const icons = {
   dashboard: LayoutDashboard, projects: FolderKanban, team: Users, sources: Database, analysis: BrainCircuit,
   handovers: FileText, verification: ShieldCheck, readiness: BarChart3, activity: Activity, settings: Settings,
@@ -38,7 +45,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
     <div className="flex h-full flex-col gap-6 bg-sidebar p-5 text-sidebar-foreground">
       <Logo />
       <nav className="flex-1 space-y-1 overflow-y-auto">
-        {navItems.map((n) => {
+        {navItems.filter((item) => roleNavigation[roleCategory]?.includes(item.slug)).map((n) => {
           const Icon = icons[n.slug];
           const cls = cn(
             "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition",
