@@ -36,6 +36,15 @@ type HandoverApproval = {
   approvedAt: string;
 };
 
+type AnswerReview = {
+  id: string;
+  answerId: string;
+  reviewerId: string;
+  action: "reviewed" | "knowledge_gap";
+  comment: string;
+  reviewedAt: string;
+};
+
 type QuickConnectData = {
   projects: Project[];
   handovers: Handover[];
@@ -43,6 +52,7 @@ type QuickConnectData = {
   answers: VerificationAnswer[];
   approvals: HandoverApproval[];
   reviews: HandoverReview[];
+  answerReviews: AnswerReview[];
   activities: Activity[];
 };
 
@@ -52,6 +62,7 @@ type QuickConnectApi = QuickConnectData & {
   reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
   resubmitHandover: (id: string, memberId: string, knowledge: Handover["knowledge"]) => void;
   submitAnswer: (answer: Omit<VerificationAnswer, "id" | "submittedAt">) => void;
+  reviewAnswer: (answerId: string, reviewerId: string, action: "reviewed" | "knowledge_gap", comment: string) => void;
 };
 
 const STORAGE_KEY = "quickconnect.dashboard.v1";
@@ -62,6 +73,7 @@ const initialData: QuickConnectData = {
   answers: [],
   approvals: [],
   reviews: [],
+  answerReviews: [],
   activities: initialActivities,
 };
 
@@ -85,7 +97,14 @@ function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
       return { data: initialData, error: new Error("Saved dashboard data has an invalid format.") };
     }
     const savedData = parsed as QuickConnectData;
-    return { data: { ...savedData, reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? (parsed as QuickConnectData).reviews : [] }, error: null };
+    return {
+      data: {
+        ...savedData,
+        reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? savedData.reviews : [],
+        answerReviews: Array.isArray((parsed as Record<string, unknown>).answerReviews) ? savedData.answerReviews : [],
+      },
+      error: null,
+    };
   } catch (error) {
     return { data: initialData, error };
   }
@@ -196,6 +215,32 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           ...current,
           answers: [...current.answers, { ...answer, answer: answer.answer.trim(), id: crypto.randomUUID(), submittedAt: new Date().toISOString() }],
           activities: [activity(answer.personId, "submitted a knowledge verification answer"), ...current.activities],
+        };
+      });
+    },
+    reviewAnswer: (answerId, reviewerId, action, comment) => {
+      const trimmedComment = comment.trim();
+      if (action === "knowledge_gap" && !trimmedComment) return;
+      setData((current) => {
+        const answer = current.answers.find((item) => item.id === answerId);
+        if (!answer) return current;
+        const latestReview = (current.answerReviews ?? []).filter((item) => item.answerId === answerId).slice(-1)[0];
+        if (latestReview?.action === "knowledge_gap" || latestReview?.action === "reviewed") return current;
+        const reviewedAt = new Date().toISOString();
+        const activityText = action === "knowledge_gap"
+          ? "flagged a knowledge gap in a verification answer"
+          : "reviewed a knowledge verification answer";
+        return {
+          ...current,
+          answerReviews: [...(current.answerReviews ?? []), {
+            id: crypto.randomUUID(),
+            answerId,
+            reviewerId,
+            action,
+            comment: trimmedComment,
+            reviewedAt,
+          }],
+          activities: [activity(reviewerId, activityText), ...current.activities],
         };
       });
     },
