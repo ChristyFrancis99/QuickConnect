@@ -154,15 +154,56 @@ export function SectionView({ slug }: { slug: string }) {
         </div>
       );
     case "verification":
+      if (roleCategory === "Incoming Member") {
+        const myHandovers = handovers.filter((item) => item.status === "Approved" && item.to === user.id);
+        const answeredFor = (handoverId: string) => answers.filter((item) => item.personId === user.id && item.handoverId === handoverId).length;
+        const totalQuestions = myHandovers.reduce((total, item) => total + item.knowledge.length, 0);
+        const totalAnswered = myHandovers.reduce((total, item) => total + answeredFor(item.id), 0);
+        return (
+          <div className="space-y-4">
+            <Card className="space-y-2">
+              <div className="flex items-center justify-between gap-3"><div><p className="font-semibold">Your verification progress</p><p className="text-xs text-muted-foreground">Across all approved handovers assigned to you</p></div><b className="text-lg">{totalAnswered}/{totalQuestions}</b></div>
+              <Bar value={totalQuestions ? (totalAnswered / totalQuestions) * 100 : 0} />
+              <p className="text-xs text-muted-foreground">{totalQuestions ? (Math.round((totalAnswered / totalQuestions) * 100) + "% completed") : "Verification will appear here when a manager approves a handover for you."}</p>
+            </Card>
+            {myHandovers.length === 0 ? (
+              <Card><p className="font-semibold">No approved handovers yet</p><p className="mt-1 text-sm text-muted-foreground">Once a project manager approves a handover addressed to you, its knowledge questions will appear here.</p></Card>
+            ) : myHandovers.map((handover) => {
+              const completed = answeredFor(handover.id);
+              const total = handover.knowledge.length;
+              const percent = total ? (completed / total) * 100 : 0;
+              return (
+                <Card key={handover.id} className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-semibold">{handover.project}</p><p className="text-xs text-muted-foreground">From {personById(handover.from).name} · {handover.date} {handover.month}</p></div><Pill tone={completed === total ? "success" : "accent"}>{completed === total ? "Completed" : "In progress"}</Pill></div>
+                  <div className="flex items-center justify-between text-xs"><span className="text-muted-foreground">Questions answered</span><b>{completed}/{total}</b></div>
+                  <Bar value={percent} />
+                  <div className="flex justify-end"><Button size="sm" variant="outline" onClick={() => ui.openVerify(user.id)}>{completed === total ? "Review answers" : completed > 0 ? "Continue verification" : "Start verification"}</Button></div>
+                </Card>
+              );
+            })}
+          </div>
+        );
+      }
+      return (
+        <div className="space-y-3">
+          {verification.map((v) => (
+            <Card key={v.who} className="flex items-center gap-4">
+              <Avatar id={v.who} size={44} />
+              <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
+              <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
+              <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>
+            </Card>
+          ))}
+        </div>
+      );
     case "readiness":
       return (
         <div className="space-y-3">
-          {verification.filter((v) => roleCategory !== "Incoming Member" || v.who === user.id).map((v) => (
+          {verification.map((v) => (
             <Card key={v.who} className="flex items-center gap-4">
               <Avatar id={v.who} size={44} />
-              <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={`var(--${readinessTone(v.readiness)})`} /></div>
+              <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
               <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
-              {slug === "verification" && <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>}
             </Card>
           ))}
         </div>
