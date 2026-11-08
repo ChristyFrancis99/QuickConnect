@@ -1,7 +1,9 @@
-import { useState } from "react";\nimport { toast } from "sonner";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Database, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";\nimport { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { people, personById, sources } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
@@ -11,7 +13,10 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, activities, verification, approvals, reviews, approveHandover, reviewHandover } = useQuickConnect();\n  const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
+  const { projects, handovers, activities, verification, approvals, reviews, approveHandover, reviewHandover, resubmitHandover } = useQuickConnect();
+  const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
+  const [editingHandover, setEditingHandover] = useState<string | null>(null);
+  const [knowledgeDrafts, setKnowledgeDrafts] = useState<Record<string, { question: string; answer: string }[]>>({});
   const allowedSections: Record<string, string[]> = {
     "Outgoing Member": ["projects", "handovers", "activity"],
     "Incoming Member": ["projects", "verification", "activity"],
@@ -104,6 +109,44 @@ export function SectionView({ slug }: { slug: string }) {
                     <Button size="sm" variant="outline" disabled={!(reviewDrafts[h.id] ?? "").trim()} onClick={() => { reviewHandover(h.id, user.id, "changes_requested", reviewDrafts[h.id]); setReviewDrafts((current) => ({ ...current, [h.id]: "" })); }}>Request changes</Button>
                     <Button size="sm" variant="ghost" disabled={!(reviewDrafts[h.id] ?? "").trim()} onClick={() => { reviewHandover(h.id, user.id, "rejected", reviewDrafts[h.id]); setReviewDrafts((current) => ({ ...current, [h.id]: "" })); }}>Reject</Button>
                   </div>
+                </div>
+              ) : roleCategory === "Outgoing Member" && h.status === "Changes requested" ? (
+                <div className="w-full space-y-3">
+                  {editingHandover === h.id ? (
+                    <>
+                      {(knowledgeDrafts[h.id] ?? h.knowledge).map((item, index) => (
+                        <div key={index} className="space-y-2 rounded-xl border border-border p-3">
+                          <label className="block space-y-1 text-xs font-medium">
+                            Knowledge question
+                            <Textarea rows={2} value={item.question} onChange={(event) => setKnowledgeDrafts((current) => ({
+                              ...current,
+                              [h.id]: (current[h.id] ?? h.knowledge).map((entry, itemIndex) => itemIndex === index ? { ...entry, question: event.target.value } : entry),
+                            }))} />
+                          </label>
+                          <label className="block space-y-1 text-xs font-medium">
+                            Answer
+                            <Textarea rows={3} value={item.answer} onChange={(event) => setKnowledgeDrafts((current) => ({
+                              ...current,
+                              [h.id]: (current[h.id] ?? h.knowledge).map((entry, itemIndex) => itemIndex === index ? { ...entry, answer: event.target.value } : entry),
+                            }))} />
+                          </label>
+                        </div>
+                      ))}
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" disabled={!(knowledgeDrafts[h.id] ?? h.knowledge).some((item) => item.question.trim() && item.answer.trim())} onClick={() => {
+                          resubmitHandover(h.id, user.id, knowledgeDrafts[h.id] ?? h.knowledge);
+                          setEditingHandover(null);
+                          setKnowledgeDrafts((current) => { const next = { ...current }; delete next[h.id]; return next; });
+                        }}>Save and resubmit</Button>
+                        <Button size="sm" variant="outline" onClick={() => { setEditingHandover(null); setKnowledgeDrafts((current) => { const next = { ...current }; delete next[h.id]; return next; }); }}>Cancel</Button>
+                      </div>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => {
+                      setKnowledgeDrafts((current) => ({ ...current, [h.id]: h.knowledge.map((item) => ({ ...item })) }));
+                      setEditingHandover(h.id);
+                    }}>Edit and resubmit</Button>
+                  )}
                 </div>
               ) : <span className="text-xs text-muted-foreground">Awaiting manager review</span>))}
             </Card>
