@@ -130,7 +130,7 @@ export function SectionView({ slug }: { slug: string }) {
                 {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
               </select>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Open</p><p className="text-xl font-semibold">{openCount}</p></div>
               <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">In progress</p><p className="text-xl font-semibold">{inProgressCount}</p></div>
               <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Resolved</p><p className="text-xl font-semibold">{resolvedCount}</p></div>
