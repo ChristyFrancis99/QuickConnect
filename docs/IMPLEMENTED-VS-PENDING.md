@@ -115,7 +115,7 @@
 ## 5. Next build sequence
 
 ### Frontend-only priorities (hackathon demo)
-1. Audit and fix role-specific frontend identity and interaction inconsistencies.
+1. [x] Audit and fix role-specific frontend identity and interaction inconsistencies.
 2. Complete the demo handover lifecycle and manager review experience.
 3. Complete incoming-member verification screens and feedback states.
 4. Improve knowledge-source management, analysis, and readiness-report interactions.
@@ -174,6 +174,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Role-based frontend navigation and actions
+- **Completed:** Added role-specific sidebar navigation and section-level access guards. Outgoing members see their own handovers and can create handovers for themselves; incoming members see their own verification workflow; project managers can review handovers and readiness; organisation admins retain the full demo workspace. Dashboard actions and summary links now reflect the active role. Handover creation defaults to the active user and prevents outgoing members from selecting another sender.
+- **Still pending:** Role-specific project data filtering beyond the handover and verification views; deeper manager review lifecycle; automated role-permission tests. These are frontend demo controls only, not server-enforced security.
+- **Files changed:** `src/components/qc/AppShell.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/components/qc/Dashboard.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched the four changed source files from GitHub and verified expected role filters, access guards, and action conditions. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Preserved demo authentication, role switching, existing layout, sample data, and localStorage. UI role restrictions are for the hackathon demo and do not replace backend authorization.
+- **Next action:** Review the handover lifecycle and manager review experience as the next frontend-only task.
+
 
 ### 2026-11-08 — Frontend demo identity consistency
 - **Completed:** Dashboard greeting now uses the active demo user. Handover approval records and its activity entry now use the active demo user instead of a fixed sample admin.
