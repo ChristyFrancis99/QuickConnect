@@ -184,11 +184,20 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
       });
     },
     submitAnswer: (answer) => {
-      setData((current) => ({
-        ...current,
-        answers: [...current.answers, { ...answer, id: crypto.randomUUID(), submittedAt: new Date().toISOString() }],
-        activities: [activity(answer.personId, "completed a knowledge verification answer"), ...current.activities],
-      }));
+      setData((current) => {
+        const handover = current.handovers.find((item) => item.id === answer.handoverId);
+        const alreadyAnswered = current.answers.some((item) =>
+          item.personId === answer.personId && item.handoverId === answer.handoverId && item.question === answer.question,
+        );
+        if (!handover || handover.status !== "Approved" || handover.to !== answer.personId || alreadyAnswered || !answer.answer.trim()) {
+          return current;
+        }
+        return {
+          ...current,
+          answers: [...current.answers, { ...answer, answer: answer.answer.trim(), id: crypto.randomUUID(), submittedAt: new Date().toISOString() }],
+          activities: [activity(answer.personId, "submitted a knowledge verification answer"), ...current.activities],
+        };
+      });
     },
   }), [data]);
 
