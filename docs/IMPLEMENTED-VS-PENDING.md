@@ -49,7 +49,7 @@
 ### P0 — Production foundation
 - [ ] Select and integrate a production authentication provider.
 - [ ] Implement secure sessions, password handling, account recovery, and real Google OAuth if required.
-- [ ] Design and connect a production database and migrations through the project's approved Lovable workflow.
+- [~] Database foundation design documented in [DATABASE-DESIGN.md](./DATABASE-DESIGN.md); actual provider provisioning, schema/migrations, and connection remain pending through the approved Lovable workflow.
 - [ ] Replace localStorage as the source of truth with server-side persistence.
 - [ ] Enforce role-based access control on the server/API, not only in the UI.
 - [ ] Add organisation and project data isolation.
@@ -160,6 +160,14 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Database foundation design prepared
+- **Completed:** Inspected `AGENTS.md`, the package manifest, Lovable project metadata, and the current auth/data stores. Added `docs/DATABASE-DESIGN.md` with the proposed tenant-aware relational model, relationships, security/RLS requirements, indexes, migration sequence, and acceptance criteria.
+- **Still pending:** No database was provisioned or connected. The repository instructions explicitly prohibit hand-editing `supabase/migrations/` and `drizzle/` and require database changes through Lovable. No Lovable MCP action is connected in this session, so provider confirmation, schema creation, RLS policies, generated types, and server-side persistence cannot safely be completed here. The current app remains localStorage/demo-backed.
+- **Files changed:** `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** GitHub source inspection only; build, lint, and tests not run. Documentation write confirmed by GitHub commit response.
+- **Decisions / blockers:** Do not create database migrations or select a provider by assumption. Use the Lovable project workflow to confirm the managed provider and apply the schema. No application UI or runtime code was changed.
+- **Next action:** Open the connected KnowFlow project in Lovable and ask it to provision/confirm the managed database, implement the schema in `docs/DATABASE-DESIGN.md`, and configure tenant/project RLS. Then verify cross-organisation access denial before wiring the frontend.
 
 ### 2026-11-08 — Documentation baseline created
 - **Completed:** Inspected the current repository structure, package dependencies, route modules, role/auth store, sample data, dashboard, section views, and local app data store. Created this tracker and the project overview.
