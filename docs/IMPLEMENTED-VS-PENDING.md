@@ -42,6 +42,7 @@
 - [x] Handover list and create-handover interaction.
 - [x] Handover approval interaction and approval history in local app state.
 - [x] Knowledge-verification and readiness views with sample readiness percentages.
+- [x] Incoming-member verification progress by approved handover, saved-answer history, and completion states (frontend prototype; no AI grading).
 - [x] Verification answer submission state in the app store.
 - [x] Activity feed and settings preference UI.
 - [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, and activity.
@@ -117,7 +118,7 @@
 ### Frontend-only priorities (hackathon demo)
 1. [x] Audit and fix role-specific frontend identity and interaction inconsistencies.
 2. [x] Complete the demo handover lifecycle and manager review experience.
-3. Complete incoming-member verification screens and feedback states.
+3. [x] Complete incoming-member verification screens and feedback states (per-handover progress and saved-answer states; AI grading remains pending).
 4. Improve knowledge-source management, analysis, and readiness-report interactions.
 5. Validate responsive layouts, navigation, loading, empty, and error states.
 
@@ -174,6 +175,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Incoming-member verification progress and feedback
+- **Completed:** Incoming members now see an overall verification progress summary and individual progress cards for each approved handover assigned to them. Cards show answered/total counts, completion state, and Start/Continue/Review actions. The verification dialog shows per-handover progress, a saved-answer history with timestamps, a clear current question count, and completion messaging. Answer submissions are checked against an approved handover assigned to that person and duplicate answers are blocked.
+- **Still pending:** AI/evidence-based grading, explanations and citations, question types, manager review of answer quality, and readiness scores calculated from actual results. The workflow remains a localStorage-backed demo.
+- **Files changed:** `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/lib/quick-connect-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched the updated files and checked progress calculations, person/handover scoping, saved-answer rendering, submission validation, duplicate prevention, and tracker entries. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Did not imply that answers are AI-graded. The UI explicitly describes responses as saved for manager review; no backend or AI integration was added.
+- **Next action:** Add a manager-facing review view for incoming-member answers, with a way to mark knowledge gaps and provide feedback.
+
 
 ### 2026-11-08 — Outgoing handover edit and resubmission
 - **Completed:** Outgoing members can edit the knowledge questions and answers on a handover marked Changes requested, then save and resubmit it. Resubmission returns the handover to Pending approval, retains prior review comments/history, and adds an activity entry attributed to the outgoing member. The store only accepts resubmission from the handover owner while the status is Changes requested.
