@@ -159,8 +159,8 @@ export function AppShell({ active, title, subtitle, children, aside }: { active:
             </SheetContent>
           </Sheet>
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-background xl:flex-row xl:overflow-hidden">
-            <main className="min-w-0 flex-none p-5 sm:p-7 xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
-              <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <main className="w-full min-w-0 flex-none p-4 sm:p-7 xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
+              <header className="mb-6 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
                   <button onClick={() => setMobileNav(true)} className="mt-1 rounded-lg bg-card p-2 shadow-soft lg:hidden" aria-label="Open menu"><Menu className="h-5 w-5" /></button>
                   <div className="min-w-0">
@@ -168,7 +168,7 @@ export function AppShell({ active, title, subtitle, children, aside }: { active:
                     {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0 sm:gap-3">
                   <SearchBox ui={ui} />
                   <button onClick={ui.openNotifications} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card shadow-soft" aria-label="Notifications">
                     <Bell className="h-4 w-4" /><span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-danger" />
