@@ -38,6 +38,7 @@
 - [x] Project list with progress and risk labels.
 - [x] Team directory with role and status information.
 - [x] Knowledge-source cards for GitHub, Jira, Confluence, Slack, Figma, and Google Drive.
+- [x] Frontend demo controls to connect/disconnect sample sources, simulate a refresh, show last demo refresh time, and record source actions in local activity history (no external service calls).
 - [x] AI-analysis screen with sample knowledge-gap findings.
 - [x] Handover list and create-handover interaction.
 - [x] Handover approval interaction and approval history in local app state.
@@ -108,7 +109,7 @@
 | Google sign-in | Simulated flow; no verified OAuth connection. |
 | Database | Supabase URL/key configuration is prepared, but no client requests, schema, or database persistence are connected. |
 | Persistence | Browser localStorage; data is local to that browser/device. |
-| Knowledge sources | Static sample source cards; no live connectors verified. |
+| Knowledge sources | Sample source records with localStorage-backed demo connect/disconnect and simulated refresh controls; no live connectors or external account access verified. |
 | AI analysis | Sample findings in UI; no live ingestion or AI analysis verified. |
 | Handover | Local prototype state; not yet a server-backed, auditable workflow. |
 | Verification | UI and local answer state; no complete evidence-based grading pipeline verified. |
@@ -121,7 +122,8 @@
 1. [x] Audit and fix role-specific frontend identity and interaction inconsistencies.
 2. [x] Complete the demo handover lifecycle and manager review experience.
 3. [x] Complete incoming-member verification screens and feedback states (per-handover progress, saved-answer states, and manager feedback; AI grading remains pending).
-4. Improve knowledge-source management, analysis, and readiness-report interactions.
+4. [x] Add interactive knowledge-source demo management (local connect/disconnect, simulated refresh, and activity history; no live integrations).
+5. Improve AI-analysis and readiness-report interactions.
 5. Validate responsive layouts, navigation, loading, empty, and error states.
 
 Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
@@ -177,6 +179,14 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Interactive knowledge-source demo management
+- **Completed:** Replaced the static source cards with local demo connection controls for GitHub, Jira, Confluence, Slack, Figma, and Google Drive. Admins can connect or disconnect a sample source and run a clearly labelled simulated refresh. The UI displays connection status and the last demo refresh time. Source state is persisted in browser localStorage, and connect/disconnect/refresh actions are added to the activity feed. Existing saved data without source state is normalized to the sample defaults.
+- **Still pending:** OAuth, external account access, real API calls, source permission scopes, ingestion, retry/error handling for real syncs, and source-backed AI analysis.
+- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched the changed files from GitHub and checked legacy localStorage fallback, source state initialization, connect/disconnect guards, connected-only simulated refresh, visible demo disclaimer, last-refresh rendering, and activity logging. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept this as a frontend-only hackathon demo. No credentials are requested or stored, and no external service is contacted. The displayed source item counts remain sample data.
+- **Next action:** Improve the AI-analysis interaction using the existing sample source and handover data, without claiming live AI processing.
 
 ### 2026-11-08 — Manager verification answer review
 - **Completed:** Added a manager/admin review queue for incoming-member verification answers. Managers can inspect the handover, respondent, question, submitted answer, and timestamp; mark an answer reviewed with optional feedback; or flag a knowledge gap with required feedback. Review status and reviewer attribution are stored in localStorage. Incoming members see the manager's decision, comment, reviewer, and timestamp alongside their saved answer history.
