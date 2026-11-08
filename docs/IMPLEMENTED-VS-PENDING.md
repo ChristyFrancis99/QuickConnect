@@ -32,6 +32,8 @@
 - [x] Browser localStorage session persistence and sign-out.
 
 ### Workspace and handover prototype
+- [x] Dashboard welcome message reflects the currently selected demo user.
+- [x] Handover approval history and approval activity record the active demo user.
 - [x] Dashboard with project counts, sample progress, handover status, readiness indicators, and sample alerts.
 - [x] Project list with progress and risk labels.
 - [x] Team directory with role and status information.
@@ -112,6 +114,16 @@
 
 ## 5. Next build sequence
 
+### Frontend-only priorities (hackathon demo)
+1. Audit and fix role-specific frontend identity and interaction inconsistencies.
+2. Complete the demo handover lifecycle and manager review experience.
+3. Complete incoming-member verification screens and feedback states.
+4. Improve knowledge-source management, analysis, and readiness-report interactions.
+5. Validate responsive layouts, navigation, loading, empty, and error states.
+
+Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
+
+
 Follow this order unless a technical dependency requires a change:
 
 1. **Production foundation:** database, authentication, organisation model, server-side permissions.
@@ -162,6 +174,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Frontend demo identity consistency
+- **Completed:** Dashboard greeting now uses the active demo user. Handover approval records and its activity entry now use the active demo user instead of a fixed sample admin.
+- **Still pending:** Broader frontend audit, role-specific workflow review, and responsive/error-state validation.
+- **Files changed:** `src/components/qc/Dashboard.tsx`, `src/components/qc/Sections.tsx`, `src/lib/quick-connect-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Source-level review only; build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept the existing demo authentication, role switching, UI layout, sample data, and localStorage persistence. No backend or Supabase work was performed.
+- **Next action:** Continue the frontend audit with the next highest-impact role-specific workflow inconsistency.
+
 
 ### 2026-11-08 — Supabase public environment configuration only
 - **Completed:** Added a local environment template for the Supabase project URL and publishable key, added a small configuration reader, and ignored local environment files so credentials are not committed. Documented setup and security boundaries.
