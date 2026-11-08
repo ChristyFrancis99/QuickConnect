@@ -162,9 +162,9 @@ Copy this template into the session log after each build session:
 ## 7. Session log
 
 ### 2026-11-08 — Remove platform-specific tooling and telemetry
-- **Completed:** Replaced the Lovable Vite wrapper with the standard Vite + TanStack Start + React + Tailwind + Nitro configuration; removed the Lovable-only dev dependency and project metadata; removed editor-specific error telemetry; kept the existing app error boundary and server error handling; replaced the generated platform-specific repository instructions with neutral project guidance.
+- **Completed:** Replaced the editor-provided Vite wrapper with the standard Vite + TanStack Start + React + Tailwind + Nitro configuration; removed the editor-only dev dependency and project metadata; removed editor-specific error telemetry; kept the existing app error boundary and server error handling; replaced the generated platform-specific repository instructions with neutral project guidance.
 - **Still pending:** Build, lint, tests, and local runtime validation have not been run in this session. The database remains a design only; no provider has been selected or connected.
-- **Files changed:** `vite.config.ts`, `package.json`, `package-lock.json`, `src/routes/__root.tsx`, `src/lib/lovable-error-reporting.ts` (deleted), `.lovable/project.json` (deleted), `AGENTS.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `vite.config.ts`, `package.json`, `package-lock.json`, `src/routes/__root.tsx`, editor telemetry module (deleted), editor project metadata (deleted), `AGENTS.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** GitHub source edits only; no local install/build/lint/test was available. Confirmed the platform-specific package and metadata references were removed from the files edited.
 - **Decisions / blockers:** Existing KnowFlow screens, routes, stores, and demo workflows were left unchanged. The Vite config now uses the framework's standard plugins; runtime/build validation is still required before considering the removal fully verified.
 - **Next action:** Clone/pull `main`, run `npm ci`, `npm run build`, `npm run lint`, and `npm test`; fix any configuration issues before selecting a database provider.
