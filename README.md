@@ -72,6 +72,19 @@ cd QuickConnect
 npm install
 ```
 
+### Supabase environment configuration
+
+The repository includes a safe environment template for the Supabase project connection.
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `VITE_SUPABASE_URL` to your Supabase project URL.
+3. Set `VITE_SUPABASE_PUBLISHABLE_KEY` to the project's publishable key.
+4. Keep `.env.local` out of Git; local environment files are ignored.
+
+Only the project URL and publishable key belong in browser-exposed variables. Never put a database password, service-role key, or secret API key in a `VITE_*` variable.
+
+At this stage, the app only reads these public configuration values. Supabase client requests, authentication, and database persistence have not been connected yet; the existing demo workflows remain in use.
+
 ### Run the development server
 
 ```bash
