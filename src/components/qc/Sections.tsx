@@ -4,7 +4,7 @@ import { Database, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { people, personById, sources } from "@/lib/data";
+import { people, personById } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
 import { useAuth } from "@/lib/auth-store";
@@ -13,7 +13,7 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, activities, verification, answers, approvals, reviews, answerReviews, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
+  const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const [answerReviewDrafts, setAnswerReviewDrafts] = useState<Record<string, string>>({});
   const [editingHandover, setEditingHandover] = useState<string | null>(null);
@@ -56,13 +56,46 @@ export function SectionView({ slug }: { slug: string }) {
       );
     case "sources":
       return (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {sources.map((s) => (
-            <Card key={s.name}>
-              <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-secondary-foreground"><Database className="h-4 w-4" /></span><div className="flex-1"><p className="font-semibold">{s.name}</p><p className="text-xs text-muted-foreground">{s.items}</p></div>
-                <Pill tone={s.status === "Synced" ? "success" : s.status === "Analyzing" ? "accent" : "warning"}>{s.status}</Pill></div>
-            </Card>
-          ))}
+        <div className="space-y-4">
+          <Card className="space-y-1">
+            <p className="font-semibold">Knowledge source connections</p>
+            <p className="text-sm text-muted-foreground">Manage the sample connections used in this demo. Connect, disconnect, and simulate a refresh without accessing external accounts or services.</p>
+          </Card>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {knowledgeSources.map((source) => (
+              <Card key={source.name} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-secondary-foreground"><Database className="h-4 w-4" /></span>
+                  <div className="min-w-0 flex-1"><p className="font-semibold">{source.name}</p><p className="text-xs text-muted-foreground">{source.items}</p></div>
+                  <Pill tone={source.status === "Synced" ? "success" : source.status === "Analyzing" ? "accent" : source.status === "Disconnected" ? "danger" : "warning"}>{source.status}</Pill>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {source.lastSyncedAt
+                    ? `Last demo refresh: ${new Date(source.lastSyncedAt).toLocaleString()}`
+                    : source.connected ? "No demo refresh recorded yet" : "This sample source is disconnected"}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {source.connected ? (
+                    <>
+                      <Button size="sm" onClick={() => {
+                        simulateSourceSync(source.name, user.id);
+                        toast.success(`${source.name} demo refresh completed.`);
+                      }}>Simulate sync</Button>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        disconnectSource(source.name, user.id);
+                        toast.success(`${source.name} demo source disconnected.`);
+                      }}>Disconnect</Button>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => {
+                      connectSource(source.name, user.id);
+                      toast.success(`${source.name} demo source connected.`);
+                    }}>Connect source</Button>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       );
     case "analysis":
