@@ -5,6 +5,7 @@ import {
   currentUser,
   handovers as initialHandovers,
   projects as initialProjects,
+  sources as initialSources,
   verification as initialVerification,
   type Activity,
   type Handover,
@@ -45,8 +46,17 @@ type AnswerReview = {
   reviewedAt: string;
 };
 
+type KnowledgeSource = {
+  name: string;
+  items: string;
+  status: "Synced" | "Analyzing" | "Pending" | "Disconnected";
+  connected: boolean;
+  lastSyncedAt: string | null;
+};
+
 type QuickConnectData = {
   projects: Project[];
+  sources: KnowledgeSource[];
   handovers: Handover[];
   verification: typeof initialVerification;
   answers: VerificationAnswer[];
@@ -63,11 +73,19 @@ type QuickConnectApi = QuickConnectData & {
   resubmitHandover: (id: string, memberId: string, knowledge: Handover["knowledge"]) => void;
   submitAnswer: (answer: Omit<VerificationAnswer, "id" | "submittedAt">) => void;
   reviewAnswer: (answerId: string, reviewerId: string, action: "reviewed" | "knowledge_gap", comment: string) => void;
+  connectSource: (name: string, actorId: string) => void;
+  disconnectSource: (name: string, actorId: string) => void;
+  simulateSourceSync: (name: string, actorId: string) => void;
 };
 
 const STORAGE_KEY = "quickconnect.dashboard.v1";
 const initialData: QuickConnectData = {
   projects: initialProjects,
+  sources: initialSources.map((source) => ({
+    ...source,
+    connected: source.status !== "Pending",
+    lastSyncedAt: null,
+  })),
   handovers: initialHandovers,
   verification: initialVerification,
   answers: [],
@@ -100,6 +118,9 @@ function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
     return {
       data: {
         ...savedData,
+        sources: Array.isArray((parsed as Record<string, unknown>).sources)
+          ? (parsed as QuickConnectData).sources
+          : initialData.sources,
         reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? savedData.reviews : [],
         answerReviews: Array.isArray((parsed as Record<string, unknown>).answerReviews) ? savedData.answerReviews : [],
       },
@@ -215,6 +236,46 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           ...current,
           answers: [...current.answers, { ...answer, answer: answer.answer.trim(), id: crypto.randomUUID(), submittedAt: new Date().toISOString() }],
           activities: [activity(answer.personId, "submitted a knowledge verification answer"), ...current.activities],
+        };
+      });
+    },
+    connectSource: (name, actorId) => {
+      setData((current) => {
+        const source = current.sources.find((item) => item.name === name);
+        if (!source || source.connected) return current;
+        return {
+          ...current,
+          sources: current.sources.map((item) => item.name === name
+            ? { ...item, connected: true, status: "Pending" }
+            : item),
+          activities: [activity(actorId, `connected the ${name} demo source`), ...current.activities],
+        };
+      });
+    },
+    disconnectSource: (name, actorId) => {
+      setData((current) => {
+        const source = current.sources.find((item) => item.name === name);
+        if (!source || !source.connected) return current;
+        return {
+          ...current,
+          sources: current.sources.map((item) => item.name === name
+            ? { ...item, connected: false, status: "Disconnected" }
+            : item),
+          activities: [activity(actorId, `disconnected the ${name} demo source`), ...current.activities],
+        };
+      });
+    },
+    simulateSourceSync: (name, actorId) => {
+      setData((current) => {
+        const source = current.sources.find((item) => item.name === name);
+        if (!source || !source.connected) return current;
+        const lastSyncedAt = new Date().toISOString();
+        return {
+          ...current,
+          sources: current.sources.map((item) => item.name === name
+            ? { ...item, status: "Synced", lastSyncedAt }
+            : item),
+          activities: [activity(actorId, `completed a demo sync for ${name}`), ...current.activities],
         };
       });
     },
