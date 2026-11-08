@@ -116,7 +116,7 @@
 
 ### Frontend-only priorities (hackathon demo)
 1. [x] Audit and fix role-specific frontend identity and interaction inconsistencies.
-2. Complete the demo handover lifecycle and manager review experience.
+2. [x] Complete the demo handover lifecycle and manager review experience.
 3. Complete incoming-member verification screens and feedback states.
 4. Improve knowledge-source management, analysis, and readiness-report interactions.
 5. Validate responsive layouts, navigation, loading, empty, and error states.
@@ -174,6 +174,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Manager handover review workflow
+- **Completed:** Expanded handover statuses to include Changes requested and Rejected. Added manager review comments, request-changes and reject actions, retained approval attribution, and recorded review history in local app state. Latest manager feedback is visible on the handover row to the handover owner. Existing saved browser data is normalized with an empty review history when the new field is absent.
+- **Still pending:** Outgoing members cannot yet edit and resubmit the handover content after a change request; review history is localStorage-backed and is not a server audit log. Add explicit resubmission and richer review timeline in a later frontend task.
+- **Files changed:** `src/lib/data.ts`, `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched source files from GitHub and checked the new status model, review actions, persistence compatibility, and feedback rendering. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept the workflow frontend-only with localStorage persistence. Existing demo authentication and sample data remain. Role checks are UI controls, not server authorization.
+- **Next action:** Add an outgoing-member edit and resubmit path for handovers marked Changes requested, then validate the full lifecycle.
+
 
 ### 2026-11-08 — Role-based frontend navigation and actions
 - **Completed:** Added role-specific sidebar navigation and section-level access guards. Outgoing members see their own handovers and can create handovers for themselves; incoming members see their own verification workflow; project managers can review handovers and readiness; organisation admins retain the full demo workspace. Dashboard actions and summary links now reflect the active role. Handover creation defaults to the active user and prevents outgoing members from selecting another sender.
