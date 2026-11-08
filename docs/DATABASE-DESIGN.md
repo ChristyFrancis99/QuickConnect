@@ -2,9 +2,9 @@
 
 > **Status:** Design proposal only. No database, migration, or production persistence is created by this document.
 
-## 1. Implementation constraint
+## 1. Implementation approach
 
-The repository's `AGENTS.md` explicitly assigns database changes to Lovable and prohibits hand-editing `supabase/migrations/` and `drizzle/`. Therefore, database provisioning, schema migrations, generated database types, and database secrets must be created through the connected Lovable project workflow. This document is the implementation specification for that workflow; it is not evidence that a database is connected.
+Choose and configure a database/authentication provider explicitly before implementation. Keep provider credentials in environment variables or a managed secrets store, never in source control. Create schema changes as versioned migrations using the selected provider's supported tooling. This document is a provider-neutral implementation specification; it is not evidence that a database is connected.
 
 The current repository uses React + TanStack Start. The existing `src/lib/auth-store.tsx` and `src/lib/quick-connect-store.tsx` use demo people and browser `localStorage`. Keep those prototype flows clearly separated until a server-backed implementation is verified.
 
@@ -83,11 +83,11 @@ Allowed role values: `outgoing_member`, `incoming_member`, `project_manager`, `o
 
 ## 6. Migration and delivery sequence
 
-1. In Lovable, confirm which managed database/auth provider is enabled for this project; do not infer it from the frontend template.
-2. Provision/enable the managed database and identity provider through Lovable.
-3. Ask Lovable to create the schema in dependency order: organisations and profiles → memberships → projects → sources/documents → claims/evidence → handovers/reviews → verification → readiness/audit.
+1. Select a managed database and authentication provider based on deployment, security, and team requirements; document the decision.
+2. Provision the database and identity provider in the chosen provider's dashboard/CLI.
+3. Create versioned migrations in dependency order: organisations and profiles → memberships → projects → sources/documents → claims/evidence → handovers/reviews → verification → readiness/audit.
 4. Add and verify tenant/project row-level policies before connecting the UI.
-5. Generate provider types through the approved workflow and keep generated files untouched by manual edits.
+5. Generate provider types through the selected provider's supported tooling and keep generated files untouched by manual edits.
 6. Add server-side data access functions in TanStack Start server functions; keep privileged credentials server-only.
 7. Migrate one vertical slice first (organisation + project read/write), then handovers and verification.
 8. Add integration tests for cross-organisation denial, role boundaries, and valid lifecycle transitions.
@@ -96,7 +96,7 @@ Allowed role values: `outgoing_member`, `incoming_member`, `project_manager`, `o
 ## 7. Acceptance criteria
 
 - A real managed database is provisioned and its provider is documented.
-- Schema and migrations are visible in the Lovable-managed workflow and applied to the target environment.
+- Schema migrations are version-controlled and applied to the target environment.
 - RLS/tenant isolation is tested with users from two organisations.
 - The server obtains identity from a verified session and enforces roles on every protected operation.
 - At least one organisation/project record can be created, fetched, and updated across sessions without relying on browser `localStorage`.
