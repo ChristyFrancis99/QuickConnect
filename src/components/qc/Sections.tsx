@@ -82,17 +82,17 @@ export function SectionView({ slug }: { slug: string }) {
               <div className="min-w-0 flex-1"><p className="font-semibold">{h.project}</p><p className="text-xs text-muted-foreground">{h.date} {h.month} · {h.time}</p></div>
               <div className="flex items-center gap-2"><Avatar id={h.from} size={30} /><span className="text-muted-foreground">→</span><Avatar id={h.to} size={30} /></div>
               <Pill tone={h.status === "Approved" ? "success" : h.status === "Rejected" ? "danger" : h.status === "Changes requested" ? "warning" : "accent"}>{h.status}</Pill>
+              {reviews.filter((review) => review.handoverId === h.id).slice(-1).map((review) => (
+                <p key={review.id} className="w-full rounded-lg bg-muted p-2 text-xs text-muted-foreground">
+                  Latest feedback: {review.comment} · {personById(review.reviewerId).name}
+                </p>
+              ))}
               {h.status === "Approved" ? (
                 <span className="text-xs text-muted-foreground">Approved by {personById(approvals.find((approval) => approval.handoverId === h.id)?.approvedBy ?? "christy").name}</span>
               ) : (h.status === "Rejected" ? (
                 <span className="text-xs text-muted-foreground">Rejected</span>
               ) : (roleCategory === "Project Manager" || roleCategory === "Organisation Admin") ? (
                 <div className="w-full space-y-2">
-                  {reviews.filter((review) => review.handoverId === h.id).slice(-1).map((review) => (
-                    <p key={review.id} className="rounded-lg bg-muted p-2 text-xs text-muted-foreground">
-                      Latest feedback: {review.comment} · {personById(review.reviewerId).name}
-                    </p>
-                  ))}
                   <Textarea
                     value={reviewDrafts[h.id] ?? ""}
                     onChange={(event) => setReviewDrafts((current) => ({ ...current, [h.id]: event.target.value }))}
