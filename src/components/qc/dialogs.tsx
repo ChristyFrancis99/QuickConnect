@@ -191,10 +191,11 @@ function Verify({ id, close }: { id: string; close: () => void }) {
   const questions = approvedHandovers.flatMap((handover) =>
     handover.knowledge.map((item) => ({ ...item, handoverId: handover.id, project: handover.project })),
   );
-  const log = answers.filter((item) => approvedHandovers.some((handover) => handover.id === item.handoverId));
-  const nextQuestion = questions.find((item) =>
-    !answers.some((entry) => entry.personId === id && entry.handoverId === item.handoverId && entry.question === item.question),
-  );
+  const log = answers.filter((item) => item.personId === id && approvedHandovers.some((handover) => handover.id === item.handoverId));
+  const hasAnswer = (handoverId: string, question: string) =>
+    answers.some((entry) => entry.personId === id && entry.handoverId === handoverId && entry.question === question);
+  const completedCount = questions.filter((item) => hasAnswer(item.handoverId, item.question)).length;
+  const nextQuestion = questions.find((item) => !hasAnswer(item.handoverId, item.question));
   const done = questions.length > 0 && !nextQuestion;
   const submit = () => {
     if (!nextQuestion || !answer.trim()) return;
@@ -205,6 +206,7 @@ function Verify({ id, close }: { id: string; close: () => void }) {
       answer: answer.trim(),
     });
     setAnswer("");
+    toast.success("Your answer has been saved.");
   };
   return (
     <>
@@ -213,29 +215,49 @@ function Verify({ id, close }: { id: string; close: () => void }) {
         <DialogDescription>Questions for {p.name} are drawn from approved handover data.</DialogDescription>
       </DialogHeader>
       <div className="space-y-3">
-        {log.map((l, k) => (
-          <div key={l.id} className="space-y-2">
+        {questions.length > 0 && (
+          <div className="rounded-2xl bg-muted p-3">
+            <div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium">Overall progress</span><b>{completedCount}/{questions.length} answered</b></div>
+            <Bar value={(completedCount / questions.length) * 100} />
+            <div className="mt-3 space-y-2">
+              {approvedHandovers.map((handover) => {
+                const total = handover.knowledge.length;
+                const completed = handover.knowledge.filter((item) => hasAnswer(handover.id, item.question)).length;
+                return (
+                  <div key={handover.id} className="flex items-center justify-between gap-2 text-xs">
+                    <span className="truncate text-muted-foreground">{handover.project}</span>
+                    <Pill tone={completed === total ? "success" : "accent"}>{completed}/{total} answered</Pill>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {log.map((l) => (
+          <div key={l.id} className="space-y-2 rounded-xl border border-border p-3">
+            <div className="flex items-center justify-between gap-2"><span className="text-xs font-medium text-muted-foreground">Question</span><Pill tone="success">Submitted</Pill></div>
             <div className="flex gap-2"><AiAvatar size={28} /><p className="rounded-2xl bg-muted px-3 py-2 text-sm">{l.question}</p></div>
             <div className="flex justify-end gap-2"><p className="rounded-2xl bg-secondary px-3 py-2 text-sm">{l.answer}</p><Avatar id={id} size={28} /></div>
+            <p className="text-right text-[11px] text-muted-foreground">Saved {new Date(l.submittedAt).toLocaleString()}</p>
           </div>
         ))}
         {questions.length === 0 ? (
           <div className="rounded-2xl bg-muted p-4 text-sm">
             <p className="font-semibold">No approved handover is available yet.</p>
-            <p className="mt-1 text-muted-foreground">Approve a handover for {p.name} before starting knowledge verification.</p>
+            <p className="mt-1 text-muted-foreground">A project manager must approve a handover for {p.name} before verification can begin.</p>
             <Button className="mt-3" size="sm" variant="outline" onClick={close}>Close</Button>
           </div>
         ) : !done ? (
           <>
-            <div className="flex gap-2"><AiAvatar size={28} /><div className="rounded-2xl bg-muted px-3 py-2 text-sm"><p className="mb-1 text-[11px] text-muted-foreground">{nextQuestion?.project}</p>{nextQuestion?.question}</div></div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground"><span>{nextQuestion?.project}</span><span>Question {completedCount + 1} of {questions.length}</span></div>
+            <div className="flex gap-2"><AiAvatar size={28} /><div className="rounded-2xl bg-muted px-3 py-2 text-sm">{nextQuestion?.question}</div></div>
             <Textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer…" className="rounded-xl" />
-            <div className="flex justify-between text-xs text-muted-foreground"><span>Question {log.length + 1} of {questions.length}</span>
-              <Button size="sm" disabled={!answer.trim()} onClick={submit}>Submit answer</Button></div>
+            <div className="flex items-center justify-between gap-3"><p className="text-xs text-muted-foreground">Your response will be saved for manager review.</p><Button size="sm" disabled={!answer.trim()} onClick={submit}>Submit answer</Button></div>
           </>
         ) : (
           <div className="rounded-2xl bg-success/10 p-4 text-sm">
-            <p className="font-semibold text-success">All questions answered</p>
-            <p className="mt-1 text-muted-foreground">Answers were sent to the project manager for review.</p>
+            <p className="font-semibold text-success">Verification completed</p>
+            <p className="mt-1 text-muted-foreground">All {questions.length} responses are saved in this demo and ready for manager review. Answers have not been AI-graded.</p>
             <Button className="mt-3" size="sm" onClick={close}>Done</Button>
           </div>
         )}
