@@ -41,13 +41,15 @@ type QuickConnectData = {
   handovers: Handover[];
   verification: typeof initialVerification;
   answers: VerificationAnswer[];
-  approvals: HandoverApproval[];\n  reviews: HandoverReview[];
+  approvals: HandoverApproval[];
+  reviews: HandoverReview[];
   activities: Activity[];
 };
 
 type QuickConnectApi = QuickConnectData & {
   addHandover: (handover: Omit<Handover, "id" | "status">) => void;
-  approveHandover: (id: string, approvedBy: string) => void;\n  reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
+  approveHandover: (id: string, approvedBy: string) => void;
+  reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
   submitAnswer: (answer: Omit<VerificationAnswer, "id" | "submittedAt">) => void;
 };
 
@@ -58,6 +60,7 @@ const initialData: QuickConnectData = {
   verification: initialVerification,
   answers: [],
   approvals: [],
+  reviews: [],
   activities: initialActivities,
 };
 
@@ -80,7 +83,8 @@ function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
     if (!isQuickConnectData(parsed)) {
       return { data: initialData, error: new Error("Saved dashboard data has an invalid format.") };
     }
-    return { data: { ...parsed, reviews: Array.isArray(data.reviews) ? data.reviews as HandoverReview[] : [] } as QuickConnectData, error: null };
+    const savedData = parsed as QuickConnectData;
+    return { data: { ...savedData, reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? (parsed as QuickConnectData).reviews : [] }, error: null };
   } catch (error) {
     return { data: initialData, error };
   }
@@ -131,7 +135,24 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
         activities: [activity(currentUser.id, `created a handover for ${newHandover.project}`), ...current.activities],
       }));
     },
-    reviewHandover: (id, reviewerId, action, comment) => {\n      const trimmedComment = comment.trim();\n      if (!trimmedComment) return;\n      setData((current) => {\n        const handover = current.handovers.find((item) => item.id === id);\n        if (!handover || handover.status === "Approved" || handover.status === "Rejected") return current;\n        const now = new Date().toISOString();\n        const status = action === "changes_requested" ? "Changes requested" : "Rejected";\n        const activityText = action === "changes_requested" ? `requested changes to the ${handover.project} handover` : `rejected the ${handover.project} handover`;\n        return {\n          ...current,\n          handovers: current.handovers.map((item) => item.id === id ? { ...item, status } : item),\n          reviews: [...(current.reviews ?? []), { id: crypto.randomUUID(), handoverId: id, reviewerId, action, comment: trimmedComment, reviewedAt: now }],\n          activities: [activity(reviewerId, activityText), ...current.activities],\n        };\n      });\n    },\n    approveHandover: (id, approvedBy) => {
+    reviewHandover: (id, reviewerId, action, comment) => {
+      const trimmedComment = comment.trim();
+      if (!trimmedComment) return;
+      setData((current) => {
+        const handover = current.handovers.find((item) => item.id === id);
+        if (!handover || handover.status === "Approved" || handover.status === "Rejected") return current;
+        const now = new Date().toISOString();
+        const status = action === "changes_requested" ? "Changes requested" : "Rejected";
+        const activityText = action === "changes_requested" ? `requested changes to the ${handover.project} handover` : `rejected the ${handover.project} handover`;
+        return {
+          ...current,
+          handovers: current.handovers.map((item) => item.id === id ? { ...item, status } : item),
+          reviews: [...(current.reviews ?? []), { id: crypto.randomUUID(), handoverId: id, reviewerId, action, comment: trimmedComment, reviewedAt: now }],
+          activities: [activity(reviewerId, activityText), ...current.activities],
+        };
+      });
+    },
+    approveHandover: (id, approvedBy) => {
       setData((current) => {
         const handover = current.handovers.find((item) => item.id === id);
         if (!handover || handover.status === "Approved" || handover.status === "Rejected") return current;
