@@ -13,7 +13,7 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, activities, verification, approvals, reviews, approveHandover, reviewHandover, resubmitHandover } = useQuickConnect();
+  const { projects, handovers, activities, verification, answers, approvals, reviews, approveHandover, reviewHandover, resubmitHandover } = useQuickConnect();
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const [editingHandover, setEditingHandover] = useState<string | null>(null);
   const [knowledgeDrafts, setKnowledgeDrafts] = useState<Record<string, { question: string; answer: string }[]>>({});
