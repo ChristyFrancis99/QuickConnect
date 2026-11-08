@@ -8,6 +8,7 @@ import { people, personById, sources } from "@/lib/data";
 import { Avatar, AiAvatar, Bar, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
 import { useQuickConnect } from "@/lib/quick-connect-store";
+import { useAuth } from "@/lib/auth-store";
 
 export type DialogState =
   | { kind: "profile"; id: string }
@@ -103,7 +104,7 @@ function HandoverWizard({ close }: { close: () => void }) {
   const { projects, addHandover } = useQuickConnect();
   const [step, setStep] = useState(0);
   const [project, setProject] = useState("pay");
-  const [from, setFrom] = useState("alex");
+  const [from, setFrom] = useState(user.id);
   const [to, setTo] = useState("priya");
   const [picked, setPicked] = useState<string[]>(["GitHub", "Jira", "Slack"]);
   const steps = ["Project", "People", "Sources", "Review"];
@@ -126,7 +127,7 @@ function HandoverWizard({ close }: { close: () => void }) {
       )}
       {step === 1 && (
         <div className="space-y-3 text-sm">
-          <label className="block">Outgoing member<select className={sel} value={from} onChange={(e) => setFrom(e.target.value)}>{people.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.role}</option>)}</select></label>
+          <label className="block">Outgoing member<select className={sel} value={from} disabled={roleCategory === "Outgoing Member"} onChange={(e) => setFrom(e.target.value)}>{people.filter((p) => roleCategory !== "Outgoing Member" || p.id === user.id).map((p) => <option key={p.id} value={p.id}>{p.name} · {p.role}</option>)}</select></label>
           <label className="block">Incoming member<select className={sel} value={to} onChange={(e) => setTo(e.target.value)}>{people.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.role}</option>)}</select></label>
         </div>
       )}
