@@ -8,6 +8,15 @@ Instead of relying on scattered documents and informal conversations, teams can 
 
 > This repository currently contains the application UI and prototype workflows. Authentication and selected interactions use local/demo logic; connect production identity, data storage, and AI services before using the platform with real organisational data.
 
+## Project documentation
+
+Start here if you are new to the repository:
+
+- **[Project Overview](docs/OVERVIEW.md)** — Problem statement, solution, users, architecture, technology stack, and current prototype boundaries.
+- **[Implemented vs Pending](docs/IMPLEMENTED-VS-PENDING.md)** — Current implementation checklist, pending roadmap, known limitations, and a session-by-session AI coding handoff log.
+
+> **For AI coding tools:** Read both documents before changing code. Update `docs/IMPLEMENTED-VS-PENDING.md` after every meaningful build session, including completed work, unfinished work, files changed, checks run, blockers, and the next action.
+
 ## Core Workflows
 
 KnowFlow supports four role-based workflows:
@@ -92,6 +101,7 @@ The application is organised around route-based pages and shared components. Key
 - `src/components/` — Reusable interface components.
 - `src/lib/` — Shared application logic, data, and authentication context.
 - `public/` — Static assets served by the application.
+- `docs/` — Project overview and implementation handoff tracker.
 
 ## Current Prototype Notes
 
@@ -99,7 +109,6 @@ The application is organised around route-based pages and shared components. Key
 - The current authentication context uses an in-app team directory and simulated credential checks. It is intended for prototyping, not secure production authentication.
 - Some integrations and AI-related workflows are represented by interface-level or demo interactions. Production deployment will require connecting approved data sources, an AI service, persistent storage, and organisation-managed authentication and permissions.
 - Do not enter real passwords, confidential source code, or sensitive company information into the prototype.
-
 
 ## Project Goal
 
