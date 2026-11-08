@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/auth-store";
 
 export function DashboardMain() {
   const ui = useUI();
-  const { user } = useAuth();
+  const { user, roleCategory } = useAuth();
   const { projects, handovers, verification, answers } = useQuickConnect();
   const avg = Math.round(projects.reduce((s, p) => s + p.progress, 0) / projects.length);
   const averageReadiness = Math.round(verification.reduce((sum, item) => sum + item.readiness, 0) / verification.length);
@@ -127,7 +127,7 @@ export function DashboardMain() {
                     <div className="mb-1 flex items-center justify-between text-sm"><span className="truncate font-medium">{p.name}</span><span className="font-semibold">{v.readiness}%</span></div>
                     <Bar value={v.readiness} color={`var(--${readinessTone(v.readiness)})`} />
                   </div>
-                  <button onClick={() => ui.openVerify(v.who)}><Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill></button>
+                  <button onClick={() => ui.openVerify(roleCategory === "Incoming Member" ? user.id : v.who)}><Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill></button>
                 </div>
               );
             })}
