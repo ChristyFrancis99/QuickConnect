@@ -42,7 +42,7 @@
 - [x] AI-analysis screen with project filtering, sample knowledge-gap findings, expandable explanations and suggested actions, status counts, and Open / In Progress / Resolved tracking (localStorage-backed demo; no live AI).
 - [x] Handover list and create-handover interaction.
 - [x] Handover approval interaction and approval history in local app state.
-- [x] Knowledge-verification and readiness views with sample readiness percentages.
+- [x] Knowledge-verification view and readiness report with per-member answer completion, manager-reviewed answers, flagged knowledge gaps, and outstanding handover actions (calculated demo metrics; not AI-graded readiness).
 - [x] Incoming-member verification progress by approved handover, saved-answer history, and completion states (frontend prototype; no AI grading).
 - [x] Verification answer submission state in the app store.
 - [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
@@ -124,7 +124,8 @@
 3. [x] Complete incoming-member verification screens and feedback states (per-handover progress, saved-answer states, and manager feedback; AI grading remains pending).
 4. [x] Add interactive knowledge-source demo management (local connect/disconnect, simulated refresh, and activity history; no live integrations).
 5. [x] Improve AI-analysis interactions (project filtering, sample finding details, and local status tracking; no live AI processing).
-6. Improve readiness-report interactions and validate responsive layouts, navigation, loading, empty, and error states.
+6. [x] Improve readiness-report interactions using submitted answers, manager reviews, knowledge-gap flags, and handover lifecycle states (local demo calculations; not production readiness).
+7. Validate responsive layouts, navigation, loading, empty, and error states.
 
 Backend integrations and production authentication remain deferred while the hackathon demo is being prepared.
 
@@ -179,6 +180,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Interactive readiness report
+- **Completed:** Replaced fixed readiness percentages on the Readiness Reports page with calculations from approved handovers, expected questions, submitted answers, manager review records, and knowledge-gap flags. Added workspace summary counts for approved handovers, handovers awaiting approval/changes, answers awaiting review, and flagged knowledge gaps. Added per-incoming-member progress, reviewed/unreviewed answer counts, knowledge-gap counts, outstanding handover actions, and a shortcut to the member's verification view.
+- **Still pending:** These are browser-local demo metrics, not AI-graded or evidence-based readiness scores. Answer correctness, source evidence, server-side reporting, and responsive/error-state validation remain pending.
+- **Files changed:** `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched source files from GitHub and checked the calculated question progress, per-member review/gap counts, outstanding handover states, summary counters, and explicit demo limitations. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept the task frontend-only and reused existing handover, answer, and answer-review state. Did not use the old fixed readiness percentages as if they were calculated results. No backend, AI grading, or authentication changes.
+- **Next action:** Validate responsive layouts and empty/error states across the main demo workflows.
+
 
 ### 2026-11-08 — Interactive AI analysis demo
 - **Completed:** Replaced the static AI Analysis list with a project filter, sample findings, finding explanations, suggested next actions, priority/source labels, and Open / In Progress / Resolved status controls. Added status counts for the selected project. Finding status is saved with the existing browser localStorage data and changes are attributed in the activity feed. Existing saved data without the new findings field falls back to the sample findings.
