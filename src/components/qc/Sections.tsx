@@ -5,10 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import { people, personById, sources } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
+import { useAuth } from "@/lib/auth-store";
 import { useQuickConnect } from "@/lib/quick-connect-store";
 
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
+  const { user } = useAuth();
   const { projects, handovers, activities, verification, approvals, approveHandover } = useQuickConnect();
   switch (slug) {
     case "projects":
@@ -73,7 +75,7 @@ export function SectionView({ slug }: { slug: string }) {
               {h.status === "Approved" ? (
                 <span className="text-xs text-muted-foreground">Approved by {personById(approvals.find((approval) => approval.handoverId === h.id)?.approvedBy ?? "christy").name}</span>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => approveHandover(h.id)}>Approve</Button>
+                <Button size="sm" variant="outline" onClick={() => approveHandover(h.id, user.id)}>Approve</Button>
               )}
             </Card>
           ))}
