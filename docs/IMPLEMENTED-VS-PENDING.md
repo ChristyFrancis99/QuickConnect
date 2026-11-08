@@ -181,6 +181,23 @@ Copy this template into the session log after each build session:
 
 ## 7. Session log
 
+### 2026-11-08 — Frontend interaction polish, button tactile feedback & responsive bug fixing
+- **Completed:**
+  - Enhanced `Button` component with tactile active feedback (`active:scale-[0.98] transition-all duration-150`), accessible 2px focus rings (`focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`), and built-in `loading` prop with animated spinner (`Loader2`).
+  - Added simulated sync loading state to Knowledge Sources with realistic 600ms feedback, disabled state during sync, and completion toast.
+  - Resolved mobile login viewport clipping (`h-screen overflow-hidden`) so small screens (360px-430px or mobile virtual keyboards) can smoothly scroll vertically to reach all inputs, submit button, SSO buttons, and footer links.
+  - Fixed mobile header layout in `AppShell` so SearchBox and the notification Bell icon fit neatly on a single line on mobile instead of forcing the Bell down onto a secondary row.
+  - Fixed horizontal overflow in Knowledge Verification sample readiness indicators by wrapping cards gracefully (`flex-wrap items-center justify-between`) on 360px viewports.
+  - Hardened modal dialogs (`Profile`, `ProjectDetail`) with safe project lookups to prevent runtime `TypeError` crashes on missing data.
+  - Added keyboard submission (`Ctrl+Enter` / `Cmd+Enter`), submitting feedback, and accessibility `aria-label` to the verification answer form in `Verify` dialog.
+  - Added tactile active states and focus rings to avatars, cards, and handover wizard step buttons.
+  - Updated lingering "QuickConnect" branding strings in `$section.tsx` and `index.tsx` page titles and metadata to "QuickFlow".
+- **Still pending:** Live AI pipeline, live source connector OAuth, production Supabase persistence, server authorization.
+- **Files changed:** `src/components/ui/button.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/components/qc/AppShell.tsx`, `src/components/qc/primitives.tsx`, `src/routes/login.tsx`, `src/routes/$section.tsx`, `src/routes/index.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** `npm run build` (passed, zero errors), `npm test` (passed, 1/1 test passed), `npx eslint` on modified files (passed, 0 errors).
+- **Decisions / blockers:** Preserved existing UI layout, demo identity, role routing, and localStorage architecture. All changes are frontend-only.
+- **Next action:** Conduct interactive end-to-end user testing of all role flows and handover creation/review lifecycle.
+
 ### 2026-11-08 — Rename product to QuickFlow and responsive source audit
 - **Completed:** Updated visible product branding and documentation from the previous project name to QuickFlow. Updated the app sidebar, sign-out message, login copy, demo email addresses, sample website project name, README, project overview, database design, and this tracker. Kept repository paths, internal QuickConnect code identifiers, and the existing localStorage key unchanged to avoid breaking imports or existing browser demo data. During the responsive source audit, changed the AI Analysis status summary from three columns at every width to one column on narrow screens and three columns from the small breakpoint upward.
 - **Still pending:** Real visual viewport testing at 360px, 768px, and desktop widths; full navigation and role walkthrough; additional responsive fixes based on screenshots/runtime behaviour. Responsive work remains in progress.

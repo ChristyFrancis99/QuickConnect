@@ -6,7 +6,7 @@ import { navItems } from "@/lib/data";
 const subtitles: Record<string, string> = {
   projects: "Every project and how ready it is for a handover.",
   team: "People across your projects and their roles.",
-  sources: "Tools QuickConnect reads to capture team knowledge.",
+  sources: "Tools QuickFlow reads to capture team knowledge.",
   analysis: "Knowledge gaps and coverage found by AI.",
   handovers: "Scheduled and in-progress handover reports.",
   verification: "Check how well incoming members understand their work.",
@@ -22,8 +22,8 @@ export const Route = createFileRoute("/$section")({
     return { label: item.label };
   },
   head: ({ loaderData, params }) => {
-    const title = loaderData ? `${loaderData.label} · QuickConnect` : "QuickConnect";
-    const desc = subtitles[params.section] ?? "QuickConnect knowledge handover platform.";
+    const title = loaderData ? `${loaderData.label} · QuickFlow` : "QuickFlow";
+    const desc = subtitles[params.section] ?? "QuickFlow knowledge handover platform.";
     return {
       meta: [
         { title },

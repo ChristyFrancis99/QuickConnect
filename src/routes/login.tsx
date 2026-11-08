@@ -155,13 +155,13 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen min-h-[100svh] w-full flex-col overflow-hidden bg-[#F7F3ED] bg-cover bg-center bg-no-repeat text-[#292929] selection:bg-[#C2A064]/20 lg:flex-row font-sans" style={{ backgroundImage: "url('/images/knowflow-login-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+    <div className="flex min-h-screen min-h-[100svh] w-full flex-col overflow-y-auto bg-[#F7F3ED] bg-cover bg-center bg-no-repeat text-[#292929] selection:bg-[#C2A064]/20 lg:h-screen lg:overflow-hidden lg:flex-row font-sans" style={{ backgroundImage: "url('/images/knowflow-login-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
       {/* =========================================================================
           LOGIN PANEL — supplied image fills the entire viewport behind the form.
           Place the original image at public/images/knowflow-login-bg.png.
-          The image scales proportionally to cover the full browser window without stretching. The viewport stays fixed without page scrolling.
+          The image scales proportionally to cover the full browser window without stretching. On desktop the viewport stays fixed; on mobile it scrolls smoothly if content exceeds height.
       ========================================================================= */}
-      <div className="flex w-full flex-col justify-between px-4 py-5 sm:px-8 sm:py-6 md:px-12 lg:h-full lg:flex-1 lg:min-w-0 lg:px-9 lg:py-6 xl:px-12">
+      <div className="flex min-h-full w-full flex-col justify-between px-4 py-5 sm:px-8 sm:py-6 md:px-12 lg:h-full lg:flex-1 lg:min-w-0 lg:overflow-y-auto lg:px-9 lg:py-6 xl:px-12">
         {/* Center content container */}
         <div className="my-auto w-full max-w-md px-5 py-8 sm:translate-x-3 sm:px-7 lg:translate-x-6 lg:px-8">
           <div className="mb-7">

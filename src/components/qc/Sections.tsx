@@ -21,6 +21,7 @@ export function SectionView({ slug }: { slug: string }) {
   const [knowledgeDrafts, setKnowledgeDrafts] = useState<Record<string, { question: string; answer: string }[]>>({});
   const [analysisProjectId, setAnalysisProjectId] = useState("all");
   const [expandedFindingId, setExpandedFindingId] = useState<string | null>(null);
+  const [syncingSource, setSyncingSource] = useState<string | null>(null);
   const allowedSections: Record<string, string[]> = {
     "Outgoing Member": ["projects", "handovers", "activity"],
     "Incoming Member": ["projects", "verification", "activity"],
@@ -80,20 +81,43 @@ export function SectionView({ slug }: { slug: string }) {
                 <div className="flex flex-wrap gap-2">
                   {source.connected ? (
                     <>
-                      <Button size="sm" onClick={() => {
-                        simulateSourceSync(source.name, user.id);
-                        toast.success(`${source.name} demo refresh completed.`);
-                      }}>Simulate sync</Button>
-                      <Button size="sm" variant="outline" onClick={() => {
-                        disconnectSource(source.name, user.id);
-                        toast.success(`${source.name} demo source disconnected.`);
-                      }}>Disconnect</Button>
+                      <Button
+                        size="sm"
+                        loading={syncingSource === source.name}
+                        onClick={() => {
+                          setSyncingSource(source.name);
+                          setTimeout(() => {
+                            simulateSourceSync(source.name, user.id);
+                            setSyncingSource(null);
+                            toast.success(`${source.name} demo refresh completed.`);
+                          }, 600);
+                        }}
+                      >
+                        {syncingSource === source.name ? "Syncing..." : "Simulate sync"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={syncingSource === source.name}
+                        onClick={() => {
+                          disconnectSource(source.name, user.id);
+                          toast.success(`${source.name} demo source disconnected.`);
+                        }}
+                      >
+                        Disconnect
+                      </Button>
                     </>
                   ) : (
-                    <Button size="sm" variant="outline" onClick={() => {
-                      connectSource(source.name, user.id);
-                      toast.success(`${source.name} demo source connected.`);
-                    }}>Connect source</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        connectSource(source.name, user.id);
+                        toast.success(`${source.name} demo source connected.`);
+                      }}
+                    >
+                      Connect source
+                    </Button>
                   )}
                 </div>
               </Card>
@@ -351,11 +375,21 @@ export function SectionView({ slug }: { slug: string }) {
           <section className="space-y-3">
             <h3 className="font-semibold">Sample readiness indicators</h3>
             {verification.map((v) => (
-              <Card key={v.who} className="flex items-center gap-4">
-                <Avatar id={v.who} size={44} />
-                <div className="min-w-0 flex-1"><div className="mb-1.5 flex justify-between text-sm"><b>{personById(v.who).name}</b><span>{v.readiness}%</span></div><Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} /></div>
-                <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
-                <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>
+              <Card key={v.who} className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                <div className="flex min-w-[180px] flex-1 items-center gap-3">
+                  <Avatar id={v.who} size={44} />
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1.5 flex justify-between text-sm">
+                      <b>{personById(v.who).name}</b>
+                      <span>{v.readiness}%</span>
+                    </div>
+                    <Bar value={v.readiness} color={"var(--" + readinessTone(v.readiness) + ")"} />
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Pill tone={readinessTone(v.readiness)}>{readinessLabel(v.readiness)}</Pill>
+                  <Button size="sm" variant="outline" onClick={() => ui.openVerify(v.who)}>Ask questions</Button>
+                </div>
               </Card>
             ))}
           </section>

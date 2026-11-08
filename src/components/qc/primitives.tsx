@@ -11,7 +11,7 @@ export function Avatar({ id, size = 36, ring = false, status = false }: { id: st
     <button
       type="button"
       onClick={(e) => { e.stopPropagation(); ui.openProfile(id); }}
-      className={cn("relative shrink-0 rounded-full transition hover:scale-105 shadow-xs overflow-hidden", ring && "ring-2 ring-card")}
+      className={cn("relative shrink-0 rounded-full transition hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-xs overflow-hidden", ring && "ring-2 ring-card")}
       style={{ width: size, height: size, backgroundColor: p.bgColor }}
       aria-label={`Open ${p.name}'s profile`}
     >
@@ -43,7 +43,7 @@ export function Card({ children, className, onClick }: { children: ReactNode; cl
       } : undefined}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      className={cn("rounded-2xl bg-card p-5 text-card-foreground shadow-soft", onClick && "cursor-pointer transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
+      className={cn("rounded-2xl bg-card p-5 text-card-foreground shadow-soft", onClick && "cursor-pointer transition hover:-translate-y-0.5 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
     >
       {children}
     </div>

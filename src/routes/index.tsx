@@ -6,10 +6,10 @@ import { useAuth } from "@/lib/auth-store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard · QuickConnect" },
-      { name: "description", content: "Track projects, knowledge handovers and team readiness in QuickConnect." },
-      { property: "og:title", content: "Dashboard · QuickConnect" },
-      { property: "og:description", content: "Track projects, knowledge handovers and team readiness in QuickConnect." },
+      { title: "Dashboard · QuickFlow" },
+      { name: "description", content: "Track projects, knowledge handovers and team readiness in QuickFlow." },
+      { property: "og:title", content: "Dashboard · QuickFlow" },
+      { property: "og:description", content: "Track projects, knowledge handovers and team readiness in QuickFlow." },
     ],
   }),
   component: Index,

@@ -57,8 +57,17 @@ function Profile({ id }: { id: string }) {
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Projects</p>
         <div className="flex flex-wrap gap-2">
           {p.projects.length ? p.projects.map((pid) => {
-            const pr = projects.find((x) => x.id === pid)!;
-            return <button key={pid} onClick={() => ui.openProject(pid)} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground hover:bg-primary hover:text-primary-foreground">{pr.name}</button>;
+            const pr = projects.find((x) => x.id === pid);
+            if (!pr) return null;
+            return (
+              <button
+                key={pid}
+                onClick={() => ui.openProject(pid)}
+                className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {pr.name}
+              </button>
+            );
           }) : <span className="text-sm text-muted-foreground">No assigned projects</span>}
         </div>
       </div>
@@ -68,7 +77,15 @@ function Profile({ id }: { id: string }) {
 
 function ProjectDetail({ id }: { id: string }) {
   const { projects } = useQuickConnect();
-  const p = projects.find((x) => x.id === id)!;
+  const p = projects.find((x) => x.id === id);
+  if (!p) {
+    return (
+      <div className="p-6 text-center text-muted-foreground">
+        <p className="font-semibold text-foreground">Project details unavailable</p>
+        <p className="mt-1 text-xs">The selected project could not be found.</p>
+      </div>
+    );
+  }
   return (
     <>
       <DialogHeader>
@@ -120,7 +137,11 @@ function HandoverWizard({ close }: { close: () => void }) {
       {step === 0 && (
         <div className="space-y-2">
           {projects.map((p) => (
-            <button key={p.id} onClick={() => setProject(p.id)} className={`flex w-full items-center justify-between rounded-xl border p-3 text-left text-sm ${project === p.id ? "border-primary bg-secondary" : "border-border"}`}>
+            <button
+              key={p.id}
+              onClick={() => setProject(p.id)}
+              className={`flex w-full items-center justify-between rounded-xl border p-3 text-left text-sm transition hover:border-primary/60 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${project === p.id ? "border-primary bg-secondary font-medium" : "border-border"}`}
+            >
               {p.name} {project === p.id && <Check className="h-4 w-4 text-primary" />}
             </button>
           ))}
@@ -137,7 +158,11 @@ function HandoverWizard({ close }: { close: () => void }) {
           {sources.map((s) => {
             const on = picked.includes(s.name);
             return (
-              <button key={s.name} onClick={() => setPicked(on ? picked.filter((x) => x !== s.name) : [...picked, s.name])} className={`rounded-xl border p-3 text-left text-sm ${on ? "border-primary bg-secondary" : "border-border"}`}>
+              <button
+                key={s.name}
+                onClick={() => setPicked(on ? picked.filter((x) => x !== s.name) : [...picked, s.name])}
+                className={`rounded-xl border p-3 text-left text-sm transition hover:border-primary/60 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${on ? "border-primary bg-secondary" : "border-border"}`}
+              >
                 <p className="font-medium">{s.name}</p><p className="text-xs text-muted-foreground">{s.items}</p>
               </button>
             );
@@ -186,6 +211,7 @@ function HandoverWizard({ close }: { close: () => void }) {
 function Verify({ id, close }: { id: string; close: () => void }) {
   const p = personById(id);
   const [answer, setAnswer] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { handovers, answers, answerReviews, submitAnswer } = useQuickConnect();
   const approvedHandovers = handovers.filter((item) => item.status === "Approved" && item.to === id);
   const questions = approvedHandovers.flatMap((handover) =>
@@ -198,15 +224,19 @@ function Verify({ id, close }: { id: string; close: () => void }) {
   const nextQuestion = questions.find((item) => !hasAnswer(item.handoverId, item.question));
   const done = questions.length > 0 && !nextQuestion;
   const submit = () => {
-    if (!nextQuestion || !answer.trim()) return;
-    submitAnswer({
-      handoverId: nextQuestion.handoverId,
-      personId: id,
-      question: nextQuestion.question,
-      answer: answer.trim(),
-    });
-    setAnswer("");
-    toast.success("Your answer has been saved.");
+    if (!nextQuestion || !answer.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      submitAnswer({
+        handoverId: nextQuestion.handoverId,
+        personId: id,
+        question: nextQuestion.question,
+        answer: answer.trim(),
+      });
+      setAnswer("");
+      setIsSubmitting(false);
+      toast.success("Your answer has been saved for manager review.");
+    }, 300);
   };
   return (
     <>
@@ -261,8 +291,25 @@ function Verify({ id, close }: { id: string; close: () => void }) {
           <>
             <div className="flex items-center justify-between text-xs text-muted-foreground"><span>{nextQuestion?.project}</span><span>Question {completedCount + 1} of {questions.length}</span></div>
             <div className="flex gap-2"><AiAvatar size={28} /><div className="rounded-2xl bg-muted px-3 py-2 text-sm">{nextQuestion?.question}</div></div>
-            <Textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer…" className="rounded-xl" />
-            <div className="flex items-center justify-between gap-3"><p className="text-xs text-muted-foreground">Your response will be saved for manager review.</p><Button size="sm" disabled={!answer.trim()} onClick={submit}>Submit answer</Button></div>
+            <Textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && answer.trim()) {
+                  e.preventDefault();
+                  submit();
+                }
+              }}
+              placeholder="Type your answer… (Ctrl+Enter to submit)"
+              aria-label="Type your answer"
+              className="rounded-xl transition focus:ring-2 focus:ring-ring"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">Your response will be saved for manager review.</p>
+              <Button size="sm" loading={isSubmitting} disabled={!answer.trim()} onClick={submit}>
+                Submit answer
+              </Button>
+            </div>
           </>
         ) : (
           <div className="rounded-2xl bg-success/10 p-4 text-sm">

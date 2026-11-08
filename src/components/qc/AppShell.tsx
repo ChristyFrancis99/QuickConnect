@@ -48,7 +48,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
         {navItems.filter((item) => roleNavigation[roleCategory]?.includes(item.slug)).map((n) => {
           const Icon = icons[n.slug];
           const cls = cn(
-            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition",
+            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
             active === n.slug ? "bg-sidebar-primary text-sidebar-primary-foreground" : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           );
           return n.slug === "dashboard" ? (
@@ -113,15 +113,21 @@ function SearchBox({ ui }: { ui: UIApi }) {
       ...projects.filter((p) => p.name.toLowerCase().includes(s)).map((p) => ({ key: p.id, label: p.name, sub: "Project", go: () => ui.openProject(p.id) })),
       ...people.filter((p) => (p.name + p.role).toLowerCase().includes(s)).map((p) => ({ key: p.id, label: p.name, sub: p.role, go: () => ui.openProfile(p.id) })),
     ].slice(0, 6);
-  }, [q, ui]);
+  }, [q, ui, projects]);
   return (
-    <div className="relative w-full sm:w-64">
+    <div className="relative flex-1 min-w-0 sm:w-64 sm:flex-initial">
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search projects or people" className="w-full rounded-full border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search projects or people"
+        aria-label="Search projects or people"
+        className="w-full rounded-full border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-ring"
+      />
       {q && (
-        <div className="absolute left-0 right-0 top-11 z-30 overflow-hidden rounded-2xl border border-border bg-popover shadow-soft">
+        <div className="absolute left-0 right-0 top-11 z-30 overflow-hidden rounded-2xl border border-border bg-popover shadow-soft animate-in fade-in-50 zoom-in-95">
           {results.length ? results.map((r) => (
-            <button key={r.sub + r.key} onClick={() => { r.go(); setQ(""); }} className="flex w-full justify-between px-4 py-2.5 text-left text-sm hover:bg-muted">
+            <button key={r.sub + r.key} onClick={() => { r.go(); setQ(""); }} className="flex w-full justify-between px-4 py-2.5 text-left text-sm transition hover:bg-muted active:bg-muted/80">
               <span>{r.label}</span><span className="text-xs text-muted-foreground">{r.sub}</span>
             </button>
           )) : <p className="px-4 py-3 text-sm text-muted-foreground">No matches</p>}
@@ -168,15 +174,15 @@ export function AppShell({ active, title, subtitle, children, aside }: { active:
                     {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
                   </div>
                 </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0 sm:gap-3">
+                <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:shrink-0 sm:gap-3">
                   <SearchBox ui={ui} />
-                  <button onClick={ui.openNotifications} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card shadow-soft" aria-label="Notifications">
+                  <button onClick={ui.openNotifications} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card shadow-soft transition hover:bg-muted active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Notifications">
                     <Bell className="h-4 w-4" /><span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-danger" />
                   </button>
                   <Link
                     to="/login"
                     title="Switch role or account"
-                    className="hidden sm:flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-soft hover:bg-muted transition"
+                    className="hidden sm:flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-soft hover:bg-muted transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span className="truncate max-w-[100px]">{user.name.split(" ")[0]}</span>
                     <span className="rounded-md px-1.5 py-0.2 text-[10px] font-medium bg-primary/15 text-foreground">{roleCategory}</span>
