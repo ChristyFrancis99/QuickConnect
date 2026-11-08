@@ -80,7 +80,7 @@ function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
     if (!isQuickConnectData(parsed)) {
       return { data: initialData, error: new Error("Saved dashboard data has an invalid format.") };
     }
-    return { data: parsed, error: null };
+    return { data: { ...parsed, reviews: Array.isArray(data.reviews) ? data.reviews as HandoverReview[] : [] } as QuickConnectData, error: null };
   } catch (error) {
     return { data: initialData, error };
   }
