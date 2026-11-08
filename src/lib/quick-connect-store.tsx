@@ -38,7 +38,7 @@ type QuickConnectData = {
 
 type QuickConnectApi = QuickConnectData & {
   addHandover: (handover: Omit<Handover, "id" | "status">) => void;
-  approveHandover: (id: string) => void;
+  approveHandover: (id: string, approvedBy: string) => void;
   submitAnswer: (answer: Omit<VerificationAnswer, "id" | "submittedAt">) => void;
 };
 
@@ -122,7 +122,7 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
         activities: [activity(currentUser.id, `created a handover for ${newHandover.project}`), ...current.activities],
       }));
     },
-    approveHandover: (id) => {
+    approveHandover: (id, approvedBy) => {
       setData((current) => {
         const handover = current.handovers.find((item) => item.id === id);
         if (!handover || handover.status === "Approved") return current;
@@ -130,8 +130,8 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
         return {
           ...current,
           handovers: current.handovers.map((item) => item.id === id ? { ...item, status: "Approved" } : item),
-          approvals: [...current.approvals, { id: crypto.randomUUID(), handoverId: id, approvedBy: currentUser.id, approvedAt: now }],
-          activities: [activity(currentUser.id, `approved the ${handover.project} handover`), ...current.activities],
+          approvals: [...current.approvals, { id: crypto.randomUUID(), handoverId: id, approvedBy, approvedAt: now }],
+          activities: [activity(approvedBy, `approved the ${handover.project} handover`), ...current.activities],
         };
       });
     },
