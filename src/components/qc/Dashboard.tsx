@@ -2,13 +2,15 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { AlertTriangle, ClipboardList, FolderKanban, GraduationCap, Lightbulb, Users, CheckCircle2, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { currentUser, people, personById } from "@/lib/data";
+import { people, personById } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, SectionHead, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
 import { useQuickConnect } from "@/lib/quick-connect-store";
+import { useAuth } from "@/lib/auth-store";
 
 export function DashboardMain() {
   const ui = useUI();
+  const { user } = useAuth();
   const { projects, handovers, verification, answers } = useQuickConnect();
   const avg = Math.round(projects.reduce((s, p) => s + p.progress, 0) / projects.length);
   const averageReadiness = Math.round(verification.reduce((sum, item) => sum + item.readiness, 0) / verification.length);
@@ -25,7 +27,7 @@ export function DashboardMain() {
     <div className="space-y-5">
       <div className="flex items-center gap-5 rounded-3xl bg-primary p-6 text-primary-foreground shadow-soft">
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-semibold sm:text-2xl">Good to see you, {currentUser.name.split(" ")[0]}!</h2>
+          <h2 className="text-xl font-semibold sm:text-2xl">Good to see you, {user.name.split(" ")[0]}!</h2>
           <p className="mt-1 max-w-md text-sm opacity-90">{handovers.length} handovers are due this month. Capture what your team knows before people move on, so work keeps moving.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" className="rounded-xl bg-card text-foreground hover:bg-card/90" onClick={ui.openHandover}>Create New Handover</Button>
