@@ -1,4 +1,4 @@
-# KnowFlow — Project Overview
+# QuickFlow — Project Overview
 
 > **Purpose:** A clear handover workspace that helps teams preserve project knowledge when someone leaves, changes roles, or moves to another project.
 
@@ -8,7 +8,7 @@ Important project knowledge often lives in people's heads, private notes, chat t
 
 ## 2. Our solution
 
-**KnowFlow** brings project knowledge and the handover process into one workspace. It is designed to help teams:
+**QuickFlow** brings project knowledge and the handover process into one workspace. It is designed to help teams:
 
 - Collect project context and knowledge from relevant sources.
 - Organise that context into structured handover information.
