@@ -102,6 +102,7 @@ function ProjectDetail({ id }: { id: string }) {
 
 function HandoverWizard({ close }: { close: () => void }) {
   const { projects, addHandover } = useQuickConnect();
+  const { user, roleCategory } = useAuth();
   const [step, setStep] = useState(0);
   const [project, setProject] = useState("pay");
   const [from, setFrom] = useState(user.id);
