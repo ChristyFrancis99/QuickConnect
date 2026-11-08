@@ -35,16 +35,16 @@ export const rolePastels: Record<string, { bg: string; name: string }> = {
 };
 
 export const people: Person[] = [
-  { id: "arjun", name: "Arjun Mehta", role: "Project Manager", avatar: a5, bgColor: "#F8E8C9", colorName: "Butter Yellow", email: "arjun@quickconnect.io", projects: ["web", "pay"], status: "active" },
-  { id: "rahul", name: "Rahul Sharma", role: "Developer", avatar: a0, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "rahul@quickconnect.io", projects: ["web", "ai"], status: "active" },
-  { id: "meera", name: "Meera Nair", role: "UI/UX Designer", avatar: a2, bgColor: "#F5DFD0", colorName: "Peach", email: "meera@quickconnect.io", projects: ["mobile", "web"], status: "active" },
-  { id: "sana", name: "Sana Kapoor", role: "HR Manager", avatar: a8, bgColor: "#F3E7D2", colorName: "Warm Cream", email: "sana@quickconnect.io", projects: [], status: "away" },
-  { id: "david", name: "David Chen", role: "Team Lead", avatar: a4, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "david@quickconnect.io", projects: ["pay", "ai"], status: "active" },
-  { id: "priya", name: "Priya Patel", role: "Incoming Employee", avatar: a6, bgColor: "#DDEDE1", colorName: "Sage Green", email: "priya@quickconnect.io", projects: ["pay"], status: "active" },
-  { id: "alex", name: "Alex Morgan", role: "Outgoing Employee", avatar: a1, bgColor: "#F8DDE0", colorName: "Soft Rose", email: "alex@quickconnect.io", projects: ["pay", "mobile"], status: "away" },
-  { id: "christy", name: "Christy Francis", role: "Administrator", avatar: a7, bgColor: "#E8E1F5", colorName: "Lavender", email: "christy@quickconnect.io", projects: ["web", "pay", "mobile", "ai"], status: "active" },
-  { id: "nina", name: "Nina Rossi", role: "QA Engineer", avatar: a3, bgColor: "#DDEDE1", colorName: "Sage Green", email: "nina@quickconnect.io", projects: ["mobile"], status: "active" },
-  { id: "kabir", name: "Kabir Rao", role: "Backend Developer", avatar: a9, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "kabir@quickconnect.io", projects: ["ai"], status: "active" },
+  { id: "arjun", name: "Arjun Mehta", role: "Project Manager", avatar: a5, bgColor: "#F8E8C9", colorName: "Butter Yellow", email: "arjun@quickflow.io", projects: ["web", "pay"], status: "active" },
+  { id: "rahul", name: "Rahul Sharma", role: "Developer", avatar: a0, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "rahul@quickflow.io", projects: ["web", "ai"], status: "active" },
+  { id: "meera", name: "Meera Nair", role: "UI/UX Designer", avatar: a2, bgColor: "#F5DFD0", colorName: "Peach", email: "meera@quickflow.io", projects: ["mobile", "web"], status: "active" },
+  { id: "sana", name: "Sana Kapoor", role: "HR Manager", avatar: a8, bgColor: "#F3E7D2", colorName: "Warm Cream", email: "sana@quickflow.io", projects: [], status: "away" },
+  { id: "david", name: "David Chen", role: "Team Lead", avatar: a4, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "david@quickflow.io", projects: ["pay", "ai"], status: "active" },
+  { id: "priya", name: "Priya Patel", role: "Incoming Employee", avatar: a6, bgColor: "#DDEDE1", colorName: "Sage Green", email: "priya@quickflow.io", projects: ["pay"], status: "active" },
+  { id: "alex", name: "Alex Morgan", role: "Outgoing Employee", avatar: a1, bgColor: "#F8DDE0", colorName: "Soft Rose", email: "alex@quickflow.io", projects: ["pay", "mobile"], status: "away" },
+  { id: "christy", name: "Christy Francis", role: "Administrator", avatar: a7, bgColor: "#E8E1F5", colorName: "Lavender", email: "christy@quickflow.io", projects: ["web", "pay", "mobile", "ai"], status: "active" },
+  { id: "nina", name: "Nina Rossi", role: "QA Engineer", avatar: a3, bgColor: "#DDEDE1", colorName: "Sage Green", email: "nina@quickflow.io", projects: ["mobile"], status: "active" },
+  { id: "kabir", name: "Kabir Rao", role: "Backend Developer", avatar: a9, bgColor: "#DCE9F8", colorName: "Powder Blue", email: "kabir@quickflow.io", projects: ["ai"], status: "active" },
 ];
 
 export const currentUser = people.find((p) => p.id === "christy")!;
@@ -63,7 +63,7 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-  { id: "web", name: "QuickConnect Website", progress: 85, color: "var(--chart-1)", owner: "arjun", due: "13 Nov", members: ["arjun", "rahul", "meera", "christy"], description: "Marketing site and customer portal rebuild.", risk: "low" },
+  { id: "web", name: "QuickFlow Website", progress: 85, color: "var(--chart-1)", owner: "arjun", due: "13 Nov", members: ["arjun", "rahul", "meera", "christy"], description: "Marketing site and customer portal rebuild.", risk: "low" },
   { id: "pay", name: "Payment Integration", progress: 65, color: "var(--chart-2)", owner: "david", due: "15 Nov", members: ["david", "alex", "priya", "arjun"], description: "Gateway, invoicing and refunds pipeline.", risk: "high" },
   { id: "mobile", name: "Mobile Application", progress: 45, color: "var(--chart-4)", owner: "meera", due: "18 Nov", members: ["meera", "nina", "alex"], description: "iOS and Android companion app.", risk: "medium" },
   { id: "ai", name: "AI Knowledge Engine", progress: 90, color: "var(--chart-3)", owner: "david", due: "22 Nov", members: ["david", "rahul", "kabir"], description: "Source ingestion, claim extraction and Q&A.", risk: "low" },
