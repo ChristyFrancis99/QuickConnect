@@ -133,7 +133,6 @@ export function DashboardMain() {
               );
             })}
           </div>
-        </Card>
         </Card>}
         <Card>
           <SectionHead title="AI Insights" />
