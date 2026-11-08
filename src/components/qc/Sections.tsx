@@ -14,6 +14,7 @@ export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
   const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, aiFindings, updateAiFindingStatus, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
+  const visibleHandovers = handovers.filter((handover) => roleCategory !== "Outgoing Member" || handover.from === user.id);
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const [answerReviewDrafts, setAnswerReviewDrafts] = useState<Record<string, string>>({});
   const [editingHandover, setEditingHandover] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export function SectionView({ slug }: { slug: string }) {
     case "projects":
       return (
         <div className="grid gap-4 md:grid-cols-2">
-          {projects.map((p) => (
+          {projects.length === 0 ? <Card><p className="font-semibold">No projects available</p><p className="mt-1 text-sm text-muted-foreground">Projects will appear here when they are added to this workspace.</p></Card> : projects.map((p) => (
             <Card key={p.id} onClick={() => ui.openProject(p.id)}>
               <div className="mb-2 flex items-center justify-between"><h3 className="font-semibold">{p.name}</h3><Pill tone={p.risk === "high" ? "danger" : p.risk === "medium" ? "warning" : "success"}>{p.risk} risk</Pill></div>
               <p className="mb-4 text-sm text-muted-foreground">{p.description}</p>
@@ -48,7 +49,7 @@ export function SectionView({ slug }: { slug: string }) {
     case "team":
       return (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {people.map((p) => (
+          {people.length === 0 ? <Card><p className="font-semibold">No team members found</p><p className="mt-1 text-sm text-muted-foreground">Team members will appear here when they are added.</p></Card> : people.map((p) => (
             <Card key={p.id} onClick={() => ui.openProfile(p.id)} className="flex items-center gap-4">
               <img src={p.avatar} alt={p.name} className="h-14 w-14 shrink-0 rounded-full object-cover shadow-xs" style={{ backgroundColor: p.bgColor }} />
               <div className="min-w-0"><p className="truncate font-semibold">{p.name}</p><p className="text-sm text-muted-foreground">{p.role}</p><Pill tone={p.status === "active" ? "success" : "warning"}>{p.status}</Pill></div>
@@ -64,7 +65,7 @@ export function SectionView({ slug }: { slug: string }) {
             <p className="text-sm text-muted-foreground">Manage the sample connections used in this demo. Connect, disconnect, and simulate a refresh without accessing external accounts or services.</p>
           </Card>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {knowledgeSources.map((source) => (
+            {knowledgeSources.length === 0 ? <Card><p className="font-semibold">No knowledge sources configured</p><p className="mt-1 text-sm text-muted-foreground">Sample source connections will appear here when configured.</p></Card> : knowledgeSources.map((source) => (
               <Card key={source.name} className="space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-secondary-foreground"><Database className="h-4 w-4" /></span>
@@ -189,8 +190,8 @@ export function SectionView({ slug }: { slug: string }) {
       return (
         <div className="space-y-3">
           {(roleCategory === "Outgoing Member" || roleCategory === "Organisation Admin") && <Button onClick={ui.openHandover}>Create New Handover</Button>}
-          {handovers.filter((h) => roleCategory !== "Outgoing Member" || h.from === user.id).map((h) => (
-            <Card key={h.id} className="flex flex-wrap items-center gap-4">
+          {visibleHandovers.length === 0 ? <Card><p className="font-semibold">No handovers to show</p><p className="mt-1 text-sm text-muted-foreground">{roleCategory === "Outgoing Member" ? "Handovers you create will appear here." : "Handovers will appear here when a team member creates one."}</p></Card> : visibleHandovers.map((h) => (
+            <Card key={h.id} className="flex min-w-0 flex-wrap items-center gap-3 sm:gap-4">
               <FileText className="h-5 w-5 text-primary" />
               <div className="min-w-0 flex-1"><p className="font-semibold">{h.project}</p><p className="text-xs text-muted-foreground">{h.date} {h.month} · {h.time}</p></div>
               <div className="flex items-center gap-2"><Avatar id={h.from} size={30} /><span className="text-muted-foreground">→</span><Avatar id={h.to} size={30} /></div>
@@ -308,7 +309,7 @@ export function SectionView({ slug }: { slug: string }) {
               return (
                 <Card key={answer.id} className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2"><Avatar id={answer.personId} size={34} /><div><p className="text-sm font-semibold">{personById(answer.personId).name}</p><p className="text-xs text-muted-foreground">{handover?.project ?? "Project handover"} · Submitted {new Date(answer.submittedAt).toLocaleString()}</p></div></div>
+                    <div className="flex min-w-0 items-center gap-2"><Avatar id={answer.personId} size={34} /><div className="min-w-0"><p className="text-sm font-semibold">{personById(answer.personId).name}</p><p className="text-xs text-muted-foreground">{handover?.project ?? "Project handover"} · Submitted {new Date(answer.submittedAt).toLocaleString()}</p></div></div>
                     {latestReview ? (
                       <Pill tone={latestReview.action === "knowledge_gap" ? "warning" : "success"}>{latestReview.action === "knowledge_gap" ? "Knowledge gap flagged" : "Reviewed"}</Pill>
                     ) : <Pill tone="accent">Needs review</Pill>}
@@ -464,8 +465,8 @@ export function SectionView({ slug }: { slug: string }) {
     case "activity":
       return (
         <div className="space-y-3">
-          {activities.map((a) => (
-            <Card key={a.id} className="flex items-center gap-3"><Avatar id={a.who} size={38} status /><p className="flex-1 text-sm"><b>{personById(a.who).name}</b> {a.text}</p><span className="text-xs text-muted-foreground">{a.when}</span></Card>
+          {activities.length === 0 ? <Card><p className="font-semibold">No activity yet</p><p className="mt-1 text-sm text-muted-foreground">Workspace actions will appear here as the team uses the demo.</p></Card> : activities.map((a) => (
+            <Card key={a.id} className="flex flex-wrap items-center gap-3"><Avatar id={a.who} size={38} status /><p className="min-w-0 flex-1 break-words text-sm"><b>{personById(a.who).name}</b> {a.text}</p><span className="ml-auto text-xs text-muted-foreground">{a.when}</span></Card>
           ))}
         </div>
       );
