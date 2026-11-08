@@ -186,7 +186,7 @@ function HandoverWizard({ close }: { close: () => void }) {
 function Verify({ id, close }: { id: string; close: () => void }) {
   const p = personById(id);
   const [answer, setAnswer] = useState("");
-  const { handovers, answers, submitAnswer } = useQuickConnect();
+  const { handovers, answers, answerReviews, submitAnswer } = useQuickConnect();
   const approvedHandovers = handovers.filter((item) => item.status === "Approved" && item.to === id);
   const questions = approvedHandovers.flatMap((handover) =>
     handover.knowledge.map((item) => ({ ...item, handoverId: handover.id, project: handover.project })),
@@ -239,6 +239,16 @@ function Verify({ id, close }: { id: string; close: () => void }) {
             <div className="flex gap-2"><AiAvatar size={28} /><p className="rounded-2xl bg-muted px-3 py-2 text-sm">{l.question}</p></div>
             <div className="flex justify-end gap-2"><p className="rounded-2xl bg-secondary px-3 py-2 text-sm">{l.answer}</p><Avatar id={id} size={28} /></div>
             <p className="text-right text-[11px] text-muted-foreground">Saved {new Date(l.submittedAt).toLocaleString()}</p>
+            {answerReviews.filter((review) => review.answerId === l.id).slice(-1).map((review) => (
+              <div key={review.id} className="rounded-xl border border-border p-3 text-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium">Manager feedback</p>
+                  <Pill tone={review.action === "knowledge_gap" ? "warning" : "success"}>{review.action === "knowledge_gap" ? "Knowledge gap" : "Reviewed"}</Pill>
+                </div>
+                {review.comment && <p className="mt-1 text-muted-foreground">{review.comment}</p>}
+                <p className="mt-2 text-[11px] text-muted-foreground">{personById(review.reviewerId).name} · {new Date(review.reviewedAt).toLocaleString()}</p>
+              </div>
+            ))}
           </div>
         ))}
         {questions.length === 0 ? (
