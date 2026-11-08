@@ -1,7 +1,7 @@
-import { toast } from "sonner";
+import { useState } from "react";\nimport { toast } from "sonner";
 import { Database, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/ui/switch";\nimport { Textarea } from "@/components/ui/textarea";
 import { people, personById, sources } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
@@ -11,7 +11,7 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, activities, verification, approvals, approveHandover } = useQuickConnect();
+  const { projects, handovers, activities, verification, approvals, reviews, approveHandover, reviewHandover } = useQuickConnect();\n  const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const allowedSections: Record<string, string[]> = {
     "Outgoing Member": ["projects", "handovers", "activity"],
     "Incoming Member": ["projects", "verification", "activity"],
@@ -81,12 +81,31 @@ export function SectionView({ slug }: { slug: string }) {
               <FileText className="h-5 w-5 text-primary" />
               <div className="min-w-0 flex-1"><p className="font-semibold">{h.project}</p><p className="text-xs text-muted-foreground">{h.date} {h.month} · {h.time}</p></div>
               <div className="flex items-center gap-2"><Avatar id={h.from} size={30} /><span className="text-muted-foreground">→</span><Avatar id={h.to} size={30} /></div>
-              <Pill tone={h.status === "Approved" ? "success" : "warning"}>{h.status}</Pill>
+              <Pill tone={h.status === "Approved" ? "success" : h.status === "Rejected" ? "danger" : h.status === "Changes requested" ? "warning" : "accent"}>{h.status}</Pill>
               {h.status === "Approved" ? (
                 <span className="text-xs text-muted-foreground">Approved by {personById(approvals.find((approval) => approval.handoverId === h.id)?.approvedBy ?? "christy").name}</span>
-              ) : (
-                {(roleCategory === "Project Manager" || roleCategory === "Organisation Admin") && <Button size="sm" variant="outline" onClick={() => approveHandover(h.id, user.id)}>Approve</Button>}
-              )}
+              ) : (h.status === "Rejected" ? (
+                <span className="text-xs text-muted-foreground">Rejected</span>
+              ) : (roleCategory === "Project Manager" || roleCategory === "Organisation Admin") ? (
+                <div className="w-full space-y-2">
+                  {reviews.filter((review) => review.handoverId === h.id).slice(-1).map((review) => (
+                    <p key={review.id} className="rounded-lg bg-muted p-2 text-xs text-muted-foreground">
+                      Latest feedback: {review.comment} · {personById(review.reviewerId).name}
+                    </p>
+                  ))}
+                  <Textarea
+                    value={reviewDrafts[h.id] ?? ""}
+                    onChange={(event) => setReviewDrafts((current) => ({ ...current, [h.id]: event.target.value }))}
+                    placeholder="Add review feedback or explain what needs to change..."
+                    rows={2}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => { approveHandover(h.id, user.id); setReviewDrafts((current) => ({ ...current, [h.id]: "" })); }}>Approve handover</Button>
+                    <Button size="sm" variant="outline" disabled={!(reviewDrafts[h.id] ?? "").trim()} onClick={() => { reviewHandover(h.id, user.id, "changes_requested", reviewDrafts[h.id]); setReviewDrafts((current) => ({ ...current, [h.id]: "" })); }}>Request changes</Button>
+                    <Button size="sm" variant="ghost" disabled={!(reviewDrafts[h.id] ?? "").trim()} onClick={() => { reviewHandover(h.id, user.id, "rejected", reviewDrafts[h.id]); setReviewDrafts((current) => ({ ...current, [h.id]: "" })); }}>Reject</Button>
+                  </div>
+                </div>
+              ) : <span className="text-xs text-muted-foreground">Awaiting manager review</span>))}
             </Card>
           ))}
         </div>
