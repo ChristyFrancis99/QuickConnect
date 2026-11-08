@@ -50,6 +50,7 @@ type QuickConnectApi = QuickConnectData & {
   addHandover: (handover: Omit<Handover, "id" | "status">) => void;
   approveHandover: (id: string, approvedBy: string) => void;
   reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
+  resubmitHandover: (id: string, memberId: string, knowledge: Handover["knowledge"]) => void;
   submitAnswer: (answer: Omit<VerificationAnswer, "id" | "submittedAt">) => void;
 };
 
@@ -149,6 +150,23 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           handovers: current.handovers.map((item) => item.id === id ? { ...item, status } : item),
           reviews: [...(current.reviews ?? []), { id: crypto.randomUUID(), handoverId: id, reviewerId, action, comment: trimmedComment, reviewedAt: now }],
           activities: [activity(reviewerId, activityText), ...current.activities],
+        };
+      });
+    },
+    resubmitHandover: (id, memberId, knowledge) => {
+      setData((current) => {
+        const handover = current.handovers.find((item) => item.id === id);
+        if (!handover || handover.from !== memberId || handover.status !== "Changes requested") return current;
+        const cleanedKnowledge = knowledge
+          .map((item) => ({ question: item.question.trim(), answer: item.answer.trim() }))
+          .filter((item) => item.question && item.answer);
+        if (cleanedKnowledge.length === 0) return current;
+        return {
+          ...current,
+          handovers: current.handovers.map((item) => item.id === id
+            ? { ...item, knowledge: cleanedKnowledge, status: "Pending approval" }
+            : item),
+          activities: [activity(memberId, `updated and resubmitted the ${handover.project} handover`), ...current.activities],
         };
       });
     },
