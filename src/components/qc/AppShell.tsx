@@ -32,7 +32,7 @@ function Logo() {
     <div className="flex items-center gap-2.5">
       <span className="grid h-9 w-9 place-items-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground"><Link2 className="h-5 w-5" /></span>
       <div>
-        <p className="text-base font-bold text-sidebar-accent-foreground">QuickConnect</p>
+        <p className="text-base font-bold text-sidebar-accent-foreground">QuickFlow</p>
         <p className="text-[10px] text-sidebar-foreground/70">Connect Knowledge. Continue Work.</p>
       </div>
     </div>
@@ -85,7 +85,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
             <DropdownMenuItem
               onSelect={() => {
                 logout();
-                toast.success("Signed out of QuickConnect");
+                toast.success("Signed out of QuickFlow");
                 window.location.href = "/login";
               }}
               className="text-danger focus:text-danger"
