@@ -13,11 +13,13 @@ import { useQuickConnect } from "@/lib/quick-connect-store";
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
+  const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, aiFindings, updateAiFindingStatus, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const [answerReviewDrafts, setAnswerReviewDrafts] = useState<Record<string, string>>({});
   const [editingHandover, setEditingHandover] = useState<string | null>(null);
   const [knowledgeDrafts, setKnowledgeDrafts] = useState<Record<string, { question: string; answer: string }[]>>({});
+  const [analysisProjectId, setAnalysisProjectId] = useState("all");
+  const [expandedFindingId, setExpandedFindingId] = useState<string | null>(null);
   const allowedSections: Record<string, string[]> = {
     "Outgoing Member": ["projects", "handovers", "activity"],
     "Incoming Member": ["projects", "verification", "activity"],
@@ -98,19 +100,91 @@ export function SectionView({ slug }: { slug: string }) {
           </div>
         </div>
       );
-    case "analysis":
+    case "analysis": {
+      const filteredFindings = aiFindings.filter((finding) =>
+        analysisProjectId === "all" || finding.projectId === analysisProjectId,
+      );
+      const openCount = filteredFindings.filter((finding) => finding.status === "Open").length;
+      const inProgressCount = filteredFindings.filter((finding) => finding.status === "In Progress").length;
+      const resolvedCount = filteredFindings.filter((finding) => finding.status === "Resolved").length;
+      const statusTone = (status: string) => status === "Resolved" ? "success" as const : status === "In Progress" ? "warning" as const : "danger" as const;
       return (
         <div className="space-y-4">
-          {[
-            { t: "Refund retry logic lives only in Alex's branch notes, not in docs.", p: "Payment Integration", tone: "danger" as const },
-            { t: "Design tokens decision (Oct 12) was agreed in Slack, never recorded.", p: "QuickConnect Website", tone: "warning" as const },
-            { t: "Push notification certificates expire 2 Dec; owner unassigned.", p: "Mobile Application", tone: "danger" as const },
-            { t: "Embedding pipeline is well documented across 9 pages.", p: "AI Knowledge Engine", tone: "success" as const },
-          ].map((f) => (
-            <Card key={f.t} className="flex items-start gap-3"><AiAvatar /><div className="flex-1"><p className="text-sm">{f.t}</p><p className="text-xs text-muted-foreground">{f.p}</p></div><Pill tone={f.tone}>{f.tone === "success" ? "Covered" : "Gap"}</Pill></Card>
-          ))}
+          <Card className="space-y-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold">Knowledge gap analysis</p>
+                <p className="text-sm text-muted-foreground">Explore sample findings by project and track the follow-up status.</p>
+              </div>
+              <Pill tone="accent">Demo analysis · Sample data</Pill>
+            </div>
+            <label className="block max-w-sm space-y-1.5 text-sm font-medium">
+              Project
+              <select
+                value={analysisProjectId}
+                onChange={(event) => setAnalysisProjectId(event.target.value)}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
+              >
+                <option value="all">All projects</option>
+                {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+              </select>
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Open</p><p className="text-xl font-semibold">{openCount}</p></div>
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">In progress</p><p className="text-xl font-semibold">{inProgressCount}</p></div>
+              <div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Resolved</p><p className="text-xl font-semibold">{resolvedCount}</p></div>
+            </div>
+          </Card>
+          <div className="space-y-3">
+            {filteredFindings.length === 0 ? (
+              <Card><p className="font-medium">No sample findings for this project</p><p className="mt-1 text-sm text-muted-foreground">Choose another project to inspect its demo analysis.</p></Card>
+            ) : filteredFindings.map((finding) => {
+              const project = projects.find((item) => item.id === finding.projectId);
+              const expanded = expandedFindingId === finding.id;
+              return (
+                <Card key={finding.id} className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <AiAvatar />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold">{finding.title}</p>
+                        <Pill tone={statusTone(finding.status)}>{finding.status}</Pill>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{project?.name ?? "Project"} · {finding.priority} priority · {finding.source}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setExpandedFindingId(expanded ? null : finding.id)}>
+                      {expanded ? "Hide details" : "View finding"}
+                    </Button>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      Status
+                      <select
+                        aria-label={`Status for ${finding.title}`}
+                        value={finding.status}
+                        onChange={(event) => updateAiFindingStatus(finding.id, event.target.value as "Open" | "In Progress" | "Resolved", user.id)}
+                        className="h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground"
+                      >
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                      </select>
+                    </label>
+                  </div>
+                  {expanded && (
+                    <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-3">
+                      <div><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Why this matters</p><p className="mt-1 text-sm">{finding.explanation}</p></div>
+                      <div><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Suggested next action</p><p className="mt-1 text-sm">{finding.suggestedAction}</p></div>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">These findings and source references are illustrative sample content. No live source ingestion, AI analysis, or automatic gap detection is running.</p>
         </div>
       );
+    }
     case "handovers":
       return (
         <div className="space-y-3">
