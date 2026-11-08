@@ -47,7 +47,9 @@
 ## 3. Pending — highest priority
 
 ### P0 — Production foundation
-- [ ] Select and integrate a production authentication provider.
+- [x] Add Supabase project URL and publishable-key environment configuration (configuration only; no live client connection yet).
+- [ ] Integrate the Supabase client and verify a live, non-privileged connection.
+- [ ] Select and integrate a production authentication provider (deferred; keep demo access for hackathon judging).
 - [ ] Implement secure sessions, password handling, account recovery, and real Google OAuth if required.
 - [~] Database foundation design documented in [DATABASE-DESIGN.md](./DATABASE-DESIGN.md); actual provider selection, provisioning, schema/migrations, and connection remain pending.
 - [ ] Replace localStorage as the source of truth with server-side persistence.
@@ -99,7 +101,7 @@
 | --- | --- |
 | Authentication | Demo user lookup and password-length check; not secure production auth. |
 | Google sign-in | Simulated flow; no verified OAuth connection. |
-| Database | No production database is wired in the inspected application code. |
+| Database | Supabase URL/key configuration is prepared, but no client requests, schema, or database persistence are connected. |
 | Persistence | Browser localStorage; data is local to that browser/device. |
 | Knowledge sources | Static sample source cards; no live connectors verified. |
 | AI analysis | Sample findings in UI; no live ingestion or AI analysis verified. |
@@ -160,6 +162,14 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Supabase public environment configuration only
+- **Completed:** Added a local environment template for the Supabase project URL and publishable key, added a small configuration reader, and ignored local environment files so credentials are not committed. Documented setup and security boundaries.
+- **Still pending:** The Supabase SDK/client is not installed or connected, no API request has been made, and no database schema or persistence is implemented. Authentication is deliberately deferred; the existing demo sign-in and sample workflows remain unchanged for hackathon judging.
+- **Files changed:** `.gitignore`, `.env.example`, `src/lib/supabase-config.ts`, `README.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** GitHub source edits only. Build, lint, tests, and a live Supabase connectivity check were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** The publishable key supplied in chat was not committed to the repository. Copy `.env.example` to `.env.local` locally and enter the project URL and publishable key there. No authentication, login UI, role behavior, database migration, or demo data flow was changed.
+- **Next action:** When needed, add the Supabase client SDK and perform a minimal read-only connectivity check; keep authentication and production role enforcement until the final hackathon-hardening phase.
 
 ### 2026-11-08 — Remove platform-specific tooling and telemetry
 - **Completed:** Replaced the editor-provided Vite wrapper with the standard Vite + TanStack Start + React + Tailwind + Nitro configuration; removed the editor-only dev dependency and project metadata; removed editor-specific error telemetry; kept the existing app error boundary and server error handling; replaced the generated platform-specific repository instructions with neutral project guidance.
