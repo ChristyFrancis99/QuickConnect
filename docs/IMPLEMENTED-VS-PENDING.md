@@ -81,8 +81,8 @@
 
 ### P2 — Handover and verification completion
 - [ ] Generate a structured handover draft from approved project sources.
-- [ ] Let outgoing members edit, confirm, and submit handover sections.
-- [ ] Add manager review comments, requested changes, approval/rejection, and audit history.
+- [x] Let outgoing members edit knowledge questions and answers after a manager requests changes, then resubmit for approval (frontend prototype).
+- [x] Add manager review comments, requested changes, approval/rejection, and local review history (frontend prototype; not a server audit log).
 - [ ] Generate incoming-member questions from approved claims and source permissions.
 - [ ] Support recall, reasoning, scenario, and uncertainty question types.
 - [ ] Evaluate free-text answers against source-backed evidence.
@@ -174,6 +174,15 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-08 — Outgoing handover edit and resubmission
+- **Completed:** Outgoing members can edit the knowledge questions and answers on a handover marked Changes requested, then save and resubmit it. Resubmission returns the handover to Pending approval, retains prior review comments/history, and adds an activity entry attributed to the outgoing member. The store only accepts resubmission from the handover owner while the status is Changes requested.
+- **Still pending:** Adding/removing knowledge items, a richer chronological review timeline, and automated lifecycle tests. Persistence remains browser localStorage.
+- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Re-fetched source files and checked the owner/status guard, trimmed question/answer validation, status reset, activity attribution, and edit/resubmit UI. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
+- **Decisions / blockers:** Kept the workflow frontend-only and preserved demo authentication, sample data, and localStorage. Rejected and approved handovers remain non-editable.
+- **Next action:** Complete the incoming-member verification flow with clearer per-handover progress and feedback states.
+
 
 ### 2026-11-08 — Manager handover review workflow
 - **Completed:** Expanded handover statuses to include Changes requested and Rejected. Added manager review comments, request-changes and reject actions, retained approval attribution, and recorded review history in local app state. Latest manager feedback is visible on the handover row to the handover owner. Existing saved browser data is normalized with an empty review history when the new field is absent.
