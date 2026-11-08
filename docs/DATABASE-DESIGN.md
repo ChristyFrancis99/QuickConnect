@@ -1,4 +1,4 @@
-# KnowFlow — Database Foundation Design
+# QuickFlow — Database Foundation Design
 
 > **Status:** Design proposal only. No database, migration, or production persistence is created by this document.
 
@@ -18,7 +18,7 @@ Use UUID primary keys, UTC timestamps, foreign keys, and database-enforced organ
 | --- | --- | --- |
 | `organisations` | `id`, `name`, `slug`, `created_at`, `updated_at` | Tenant/workspace boundary. |
 | `user_profiles` | `id` (same identity-provider user UUID), `display_name`, `email`, `created_at`, `updated_at` | App profile; credentials remain with the auth provider. |
-| `organisation_memberships` | `id`, `organisation_id`, `user_id`, `role`, `status`, `created_at` | Membership and one of the four KnowFlow roles. |
+| `organisation_memberships` | `id`, `organisation_id`, `user_id`, `role`, `status`, `created_at` | Membership and one of the four QuickFlow roles. |
 
 Allowed role values: `outgoing_member`, `incoming_member`, `project_manager`, `organisation_admin`. Enforce membership uniqueness per organisation/user. Do not store passwords or provider tokens in these tables.
 
