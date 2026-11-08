@@ -78,7 +78,7 @@ export type Handover = {
   from: string;
   to: string;
   time: string;
-  status: "Pending approval" | "Approved";
+  status: "Pending approval" | "Changes requested" | "Approved" | "Rejected";
   knowledge: { question: string; answer: string }[];
 };
 
