@@ -8,7 +8,7 @@ import { people, personById } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
 import { useAuth } from "@/lib/auth-store";
-import { useQuickConnect } from "@/lib/quick-connect-store";
+import { useQuickConnect } from "@/lib/quick-flow-store";
 
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
