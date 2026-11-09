@@ -1,4 +1,4 @@
-# QuickFlow — Database Foundation Design
+# QuickConnect — Database Foundation Design
 
 > **Status:** Design proposal only. No database, migration, or production persistence is created by this document.
 
@@ -6,7 +6,7 @@
 
 Choose and configure a database/authentication provider explicitly before implementation. Keep provider credentials in environment variables or a managed secrets store, never in source control. Create schema changes as versioned migrations using the selected provider's supported tooling. This document is a provider-neutral implementation specification; it is not evidence that a database is connected.
 
-The current repository uses React + TanStack Start. The existing `src/lib/auth-store.tsx` and `src/lib/quick-flow-store.tsx` use demo people and browser `localStorage`. Keep those prototype flows clearly separated until a server-backed implementation is verified.
+The current repository uses React + TanStack Start. The existing `src/lib/auth-store.tsx` and `src/lib/quick-connect-store.tsx` use demo people and browser `localStorage`. Keep those prototype flows clearly separated until a server-backed implementation is verified.
 
 ## 2. Initial relational model
 
@@ -18,7 +18,7 @@ Use UUID primary keys, UTC timestamps, foreign keys, and database-enforced organ
 | --- | --- | --- |
 | `organisations` | `id`, `name`, `slug`, `created_at`, `updated_at` | Tenant/workspace boundary. |
 | `user_profiles` | `id` (same identity-provider user UUID), `display_name`, `email`, `created_at`, `updated_at` | App profile; credentials remain with the auth provider. |
-| `organisation_memberships` | `id`, `organisation_id`, `user_id`, `role`, `status`, `created_at` | Membership and one of the four QuickFlow roles. |
+| `organisation_memberships` | `id`, `organisation_id`, `user_id`, `role`, `status`, `created_at` | Membership and one of the four QuickConnect roles. |
 
 Allowed role values: `outgoing_member`, `incoming_member`, `project_manager`, `organisation_admin`. Enforce membership uniqueness per organisation/user. Do not store passwords or provider tokens in these tables.
 
