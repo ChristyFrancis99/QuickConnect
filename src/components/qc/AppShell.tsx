@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { navItems, people } from "@/lib/data";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
-import { useQuickFlow } from "@/lib/quick-flow-store";
+import { useQuickConnect } from "@/lib/quick-connect-store";
 import { toast } from "sonner";
 import { UICtx, type UIApi } from "./ui-context";
 import { Dialogs, type DialogState } from "./dialogs";
@@ -32,7 +32,7 @@ function Logo() {
     <div className="flex items-center gap-2.5">
       <span className="grid h-9 w-9 place-items-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground"><Link2 className="h-5 w-5" /></span>
       <div>
-        <p className="text-base font-bold text-sidebar-accent-foreground">QuickFlow</p>
+        <p className="text-base font-bold text-sidebar-accent-foreground">QuickConnect</p>
         <p className="text-[10px] text-sidebar-foreground/70">Connect Knowledge. Continue Work.</p>
       </div>
     </div>
@@ -85,7 +85,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
             <DropdownMenuItem
               onSelect={() => {
                 logout();
-                toast.success("Signed out of QuickFlow");
+                toast.success("Signed out of QuickConnect");
                 window.location.href = "/login";
               }}
               className="text-danger focus:text-danger"
@@ -105,7 +105,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
 
 function SearchBox({ ui }: { ui: UIApi }) {
   const [q, setQ] = useState("");
-  const { projects } = useQuickFlow();
+  const { projects } = useQuickConnect();
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return [];
