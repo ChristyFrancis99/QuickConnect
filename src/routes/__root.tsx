@@ -11,7 +11,7 @@ import {
 import { type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { QuickConnectProvider } from "@/lib/quick-connect-store";
+import { QuickFlowProvider } from "@/lib/quick-flow-store";
 import { AuthProvider } from "@/lib/auth-store";
 import appCss from "../styles.css?url";
 
@@ -117,10 +117,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <QuickConnectProvider>
+        <QuickFlowProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
-        </QuickConnectProvider>
+        </QuickFlowProvider>
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
