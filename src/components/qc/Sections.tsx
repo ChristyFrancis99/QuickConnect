@@ -8,12 +8,12 @@ import { people, personById } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
 import { useAuth } from "@/lib/auth-store";
-import { useQuickConnect } from "@/lib/quick-flow-store";
+import { useQuickFlow } from "@/lib/quick-flow-store";
 
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, aiFindings, updateAiFindingStatus, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
+  const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, aiFindings, updateAiFindingStatus, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickFlow();
   const visibleHandovers = handovers.filter((handover) => roleCategory !== "Outgoing Member" || handover.from === user.id);
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
   const [answerReviewDrafts, setAnswerReviewDrafts] = useState<Record<string, string>>({});
