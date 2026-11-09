@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { people, personById } from "@/lib/data";
 import { AiAvatar, Avatar, Bar, Card, Pill, SectionHead, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
-import { useQuickFlow } from "@/lib/quick-flow-store";
+import { useQuickConnect } from "@/lib/quick-connect-store";
 import { useAuth } from "@/lib/auth-store";
 
 export function DashboardMain() {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
-  const { projects, handovers, verification, answers } = useQuickFlow();
+  const { projects, handovers, verification, answers } = useQuickConnect();
   const avg = projects.length ? Math.round(projects.reduce((s, p) => s + p.progress, 0) / projects.length) : 0;
   const averageReadiness = verification.length ? Math.round(verification.reduce((sum, item) => sum + item.readiness, 0) / verification.length) : 0;
   const pendingHandovers = handovers.filter((item) => item.status !== "Approved").length;
@@ -152,7 +152,7 @@ export function DashboardMain() {
 export function ActivityPanel() {
   const ui = useUI();
   const nav = useNavigate();
-  const { handovers, activities } = useQuickFlow();
+  const { handovers, activities } = useQuickConnect();
   const go = (section: string) => nav({ to: "/$section", params: { section } });
   const team = ["arjun", "meera", "david", "priya"];
   return (
