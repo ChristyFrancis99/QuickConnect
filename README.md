@@ -67,8 +67,8 @@ QuickFlow supports four role-based workflows:
 Clone the repository and install its dependencies:
 
 ```bash
-git clone https://github.com/ChristyFrancis99/QuickConnect.git
-cd QuickConnect
+git clone https://github.com/ChristyFrancis99/QuickFlow.git
+cd QuickFlow
 npm install
 ```
 
