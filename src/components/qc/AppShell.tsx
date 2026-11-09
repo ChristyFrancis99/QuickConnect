@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { navItems, people } from "@/lib/data";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
-import { useQuickConnect } from "@/lib/quick-flow-store";
+import { useQuickFlow } from "@/lib/quick-flow-store";
 import { toast } from "sonner";
 import { UICtx, type UIApi } from "./ui-context";
 import { Dialogs, type DialogState } from "./dialogs";
@@ -105,7 +105,7 @@ function SidebarBody({ active, dark, setDark, onNav }: { active: string; dark: b
 
 function SearchBox({ ui }: { ui: UIApi }) {
   const [q, setQ] = useState("");
-  const { projects } = useQuickConnect();
+  const { projects } = useQuickFlow();
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return [];
