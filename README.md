@@ -1,8 +1,8 @@
-# QuickFlow — AI-Powered Knowledge Handover Platform
+# QuickConnect — AI-Powered Knowledge Handover Platform
 
 **Capture. Verify. Transfer.**
 
-QuickFlow is a knowledge handover platform designed to reduce knowledge loss when people leave a team, change roles, or move between projects. It brings project context, handover documentation, knowledge verification, and team readiness into one workspace.
+QuickConnect is a knowledge handover platform designed to reduce knowledge loss when people leave a team, change roles, or move between projects. It brings project context, handover documentation, knowledge verification, and team readiness into one workspace.
 
 Instead of relying on scattered documents and informal conversations, teams can organise project knowledge, prepare structured handovers, review knowledge gaps, and help incoming members understand the work they are taking over.
 
@@ -19,7 +19,7 @@ Start here if you are new to the repository:
 
 ## Core Workflows
 
-QuickFlow supports four role-based workflows:
+QuickConnect supports four role-based workflows:
 
 | Role | Main responsibility |
 | --- | --- |
@@ -125,4 +125,4 @@ The application is organised around route-based pages and shared components. Key
 
 ## Project Goal
 
-The goal of QuickFlow is to make project knowledge transferable, traceable, and verifiable—so that when a team member moves on, the team's understanding of the work does not move with them.
+The goal of QuickConnect is to make project knowledge transferable, traceable, and verifiable—so that when a team member moves on, the team's understanding of the work does not move with them.
