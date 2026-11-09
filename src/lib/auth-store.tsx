@@ -89,7 +89,7 @@ interface AuthContextType extends AuthState {
   switchUser: (personId: string) => void;
 }
 
-const AUTH_STORAGE_KEY = "quickflow.auth.session.v1";
+const AUTH_STORAGE_KEY = "quickconnect.auth.session.v1";
 const DEFAULT_USER_ID = "christy";
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -173,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     }
 
-    // Passwords for demo/team members: any password >= 4 chars or "quickflow", "password", etc.
+    // Passwords for demo/team members: any password >= 4 chars or "quickconnect", "password", etc.
     if (password.length < 4) {
       return {
         success: false,
