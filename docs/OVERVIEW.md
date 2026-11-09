@@ -52,7 +52,7 @@ TanStack Start application
         |     +-- Demo user / role selection
         |     +-- Browser localStorage session
         |
-        +-- quick-connect-store.tsx
+        +-- quick-flow-store.tsx
         |     +-- Projects, handovers, approvals, answers
         |     +-- Browser localStorage persistence
         |
