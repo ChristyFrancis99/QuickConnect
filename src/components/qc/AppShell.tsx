@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { navItems, people } from "@/lib/data";
 import { useAuth } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
-import { useQuickConnect } from "@/lib/quick-connect-store";
+import { useQuickConnect } from "@/lib/quick-flow-store";
 import { toast } from "sonner";
 import { UICtx, type UIApi } from "./ui-context";
 import { Dialogs, type DialogState } from "./dialogs";
