@@ -11,7 +11,7 @@ import {
 import { type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { QuickFlowProvider } from "@/lib/quick-flow-store";
+import { QuickConnectProvider } from "@/lib/quick-connect-store";
 import { AuthProvider } from "@/lib/auth-store";
 import appCss from "../styles.css?url";
 
@@ -76,7 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "QuickFlow" },
+      { title: "QuickConnect" },
       { name: "description", content: "AI-powered knowledge handover and project continuity." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -117,10 +117,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <QuickFlowProvider>
+        <QuickConnectProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
-        </QuickFlowProvider>
+        </QuickConnectProvider>
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
