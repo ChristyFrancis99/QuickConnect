@@ -65,7 +65,7 @@ type AiFinding = {
   status: "Open" | "In Progress" | "Resolved";
 };
 
-type QuickFlowData = {
+type QuickConnectData = {
   projects: Project[];
   sources: KnowledgeSource[];
   handovers: Handover[];
@@ -78,7 +78,7 @@ type QuickFlowData = {
   activities: Activity[];
 };
 
-type QuickFlowApi = QuickFlowData & {
+type QuickConnectApi = QuickConnectData & {
   addHandover: (handover: Omit<Handover, "id" | "status">) => void;
   approveHandover: (id: string, approvedBy: string) => void;
   reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
@@ -91,8 +91,8 @@ type QuickFlowApi = QuickFlowData & {
   updateAiFindingStatus: (id: string, status: AiFinding["status"], actorId: string) => void;
 };
 
-const STORAGE_KEY = "quickflow.dashboard.v1";
-const initialData: QuickFlowData = {
+const STORAGE_KEY = "quickconnect.dashboard.v1";
+const initialData: QuickConnectData = {
   projects: initialProjects,
   sources: initialSources.map((source) => ({
     ...source,
@@ -150,9 +150,9 @@ const initialData: QuickFlowData = {
   activities: initialActivities,
 };
 
-const QuickFlowContext = createContext<QuickFlowApi | null>(null);
+const QuickConnectContext = createContext<QuickConnectApi | null>(null);
 
-function isQuickFlowData(value: unknown): value is QuickFlowData {
+function isQuickConnectData(value: unknown): value is QuickConnectData {
   if (!value || typeof value !== "object") return false;
   const data = value as Record<string, unknown>;
   return ["projects", "handovers", "verification", "answers", "approvals", "activities"].every(
@@ -160,21 +160,21 @@ function isQuickFlowData(value: unknown): value is QuickFlowData {
   );
 }
 
-function loadSavedData(): { data: QuickFlowData; error: unknown | null } {
+function loadSavedData(): { data: QuickConnectData; error: unknown | null } {
   if (typeof window === "undefined") return { data: initialData, error: null };
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (!saved) return { data: initialData, error: null };
     const parsed: unknown = JSON.parse(saved);
-    if (!isQuickFlowData(parsed)) {
+    if (!isQuickConnectData(parsed)) {
       return { data: initialData, error: new Error("Saved dashboard data has an invalid format.") };
     }
-    const savedData = parsed as QuickFlowData;
+    const savedData = parsed as QuickConnectData;
     return {
       data: {
         ...savedData,
         sources: Array.isArray((parsed as Record<string, unknown>).sources)
-          ? (parsed as QuickFlowData).sources
+          ? (parsed as QuickConnectData).sources
           : initialData.sources,
         reviews: Array.isArray((parsed as Record<string, unknown>).reviews) ? savedData.reviews : [],
         answerReviews: Array.isArray((parsed as Record<string, unknown>).answerReviews) ? savedData.answerReviews : [],
@@ -191,7 +191,7 @@ function activity(who: string, text: string): Activity {
   return { id: crypto.randomUUID(), who, text, when: "Just now" };
 }
 
-export function QuickFlowProvider({ children }: { children: ReactNode }) {
+export function QuickConnectProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState(initialData);
   const [loaded, setLoaded] = useState(false);
   const [storageError, setStorageError] = useState<unknown | null>(null);
@@ -213,12 +213,12 @@ export function QuickFlowProvider({ children }: { children: ReactNode }) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       setStorageError(null);
     } catch (error) {
-      console.error("Could not save QuickFlow dashboard data.", error);
+      console.error("Could not save QuickConnect dashboard data.", error);
       toast.error("Dashboard changes could not be saved in this browser.");
     }
   }, [data, loaded]);
 
-  const api = useMemo<QuickFlowApi>(() => ({
+  const api = useMemo<QuickConnectApi>(() => ({
     ...data,
     addHandover: (handover) => {
       const newHandover: Handover = {
@@ -374,11 +374,11 @@ export function QuickFlowProvider({ children }: { children: ReactNode }) {
     },
   }), [data]);
 
-  return <QuickFlowContext.Provider value={api}>{children}</QuickFlowContext.Provider>;
+  return <QuickConnectContext.Provider value={api}>{children}</QuickConnectContext.Provider>;
 }
 
-export function useQuickFlow() {
-  const value = useContext(QuickFlowContext);
-  if (!value) throw new Error("useQuickFlow must be used within QuickFlowProvider");
+export function useQuickConnect() {
+  const value = useContext(QuickConnectContext);
+  if (!value) throw new Error("useQuickConnect must be used within QuickConnectProvider");
   return value;
 }
