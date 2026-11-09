@@ -191,7 +191,7 @@ Copy this template into the session log after each build session:
   - Hardened modal dialogs (`Profile`, `ProjectDetail`) with safe project lookups to prevent runtime `TypeError` crashes on missing data.
   - Added keyboard submission (`Ctrl+Enter` / `Cmd+Enter`), submitting feedback, and accessibility `aria-label` to the verification answer form in `Verify` dialog.
   - Added tactile active states and focus rings to avatars, cards, and handover wizard step buttons.
-  - Updated lingering "QuickConnect" branding strings in `$section.tsx` and `index.tsx` page titles and metadata to "QuickFlow".
+  - Updated lingering "QuickFlow" branding strings in `$section.tsx` and `index.tsx` page titles and metadata to "QuickFlow".
 - **Still pending:** Live AI pipeline, live source connector OAuth, production Supabase persistence, server authorization.
 - **Files changed:** `src/components/ui/button.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/components/qc/AppShell.tsx`, `src/components/qc/primitives.tsx`, `src/routes/login.tsx`, `src/routes/$section.tsx`, `src/routes/index.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** `npm run build` (passed, zero errors), `npm test` (passed, 1/1 test passed), `npx eslint` on modified files (passed, 0 errors).
@@ -199,11 +199,11 @@ Copy this template into the session log after each build session:
 - **Next action:** Conduct interactive end-to-end user testing of all role flows and handover creation/review lifecycle.
 
 ### 2026-11-08 — Rename product to QuickFlow and responsive source audit
-- **Completed:** Updated visible product branding and documentation from the previous project name to QuickFlow. Updated the app sidebar, sign-out message, login copy, demo email addresses, sample website project name, README, project overview, database design, and this tracker. Kept repository paths, internal QuickConnect code identifiers, and the existing localStorage key unchanged to avoid breaking imports or existing browser demo data. During the responsive source audit, changed the AI Analysis status summary from three columns at every width to one column on narrow screens and three columns from the small breakpoint upward.
+- **Completed:** Updated visible product branding and documentation from the previous project name to QuickFlow. Updated the app sidebar, sign-out message, login copy, demo email addresses, sample website project name, README, project overview, database design, and this tracker. Kept repository paths, internal QuickFlow code identifiers, and the existing localStorage key unchanged to avoid breaking imports or existing browser demo data. During the responsive source audit, changed the AI Analysis status summary from three columns at every width to one column on narrow screens and three columns from the small breakpoint upward.
 - **Still pending:** Real visual viewport testing at 360px, 768px, and desktop widths; full navigation and role walkthrough; additional responsive fixes based on screenshots/runtime behaviour. Responsive work remains in progress.
 - **Files changed:** `README.md`, `docs/OVERVIEW.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`, `src/components/qc/AppShell.tsx`, `src/routes/login.tsx`, `src/routes/__root.tsx`, `src/lib/data.ts`, `src/components/qc/Sections.tsx`.
 - **Checks:** Re-fetched changed files from GitHub and inspected the updated branding strings and responsive grid class. Build, lint, automated tests, and browser viewport checks were not run.
-- **Decisions / blockers:** QuickConnect remains the GitHub repository name and internal store/hook identifiers remain unchanged; these are implementation/repository identifiers, not displayed product branding. The existing login background asset filename also remains unchanged so the current image reference is not broken.
+- **Decisions / blockers:** QuickFlow remains the GitHub repository name and internal store/hook identifiers remain unchanged; these are implementation/repository identifiers, not displayed product branding. The existing login background asset filename also remains unchanged so the current image reference is not broken.
 - **Next action:** Pull the changes locally, verify login and role switching with the updated demo emails, then test the app at 360px, 768px, and desktop widths and report any overflow or layout breakage.
 
 
@@ -228,7 +228,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Interactive AI analysis demo
 - **Completed:** Replaced the static AI Analysis list with a project filter, sample findings, finding explanations, suggested next actions, priority/source labels, and Open / In Progress / Resolved status controls. Added status counts for the selected project. Finding status is saved with the existing browser localStorage data and changes are attributed in the activity feed. Existing saved data without the new findings field falls back to the sample findings.
 - **Still pending:** Live AI inference, source ingestion, source-backed citations, automatic knowledge-gap detection, and a production review pipeline. All displayed findings and source references are illustrative demo content.
-- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/lib/quick-flow-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched source files from GitHub and checked the project filter, finding detail fields, status transitions, activity attribution, localStorage compatibility fallback, and tracker update. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept this task frontend-only. No live AI service, external source, backend, or authentication flow was added.
 - **Next action:** Improve readiness-report interactions using the existing demo verification and review data, without presenting sample percentages as calculated production readiness.
@@ -236,7 +236,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Interactive knowledge-source demo management
 - **Completed:** Replaced the static source cards with local demo connection controls for GitHub, Jira, Confluence, Slack, Figma, and Google Drive. Admins can connect or disconnect a sample source and run a clearly labelled simulated refresh. The UI displays connection status and the last demo refresh time. Source state is persisted in browser localStorage, and connect/disconnect/refresh actions are added to the activity feed. Existing saved data without source state is normalized to the sample defaults.
 - **Still pending:** OAuth, external account access, real API calls, source permission scopes, ingestion, retry/error handling for real syncs, and source-backed AI analysis.
-- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/lib/quick-flow-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched the changed files from GitHub and checked legacy localStorage fallback, source state initialization, connect/disconnect guards, connected-only simulated refresh, visible demo disclaimer, last-refresh rendering, and activity logging. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept this as a frontend-only hackathon demo. No credentials are requested or stored, and no external service is contacted. The displayed source item counts remain sample data.
 - **Next action:** Improve the AI-analysis interaction using the existing sample source and handover data, without claiming live AI processing.
@@ -244,7 +244,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Manager verification answer review
 - **Completed:** Added a manager/admin review queue for incoming-member verification answers. Managers can inspect the handover, respondent, question, submitted answer, and timestamp; mark an answer reviewed with optional feedback; or flag a knowledge gap with required feedback. Review status and reviewer attribution are stored in localStorage. Incoming members see the manager's decision, comment, reviewer, and timestamp alongside their saved answer history.
 - **Still pending:** AI/evidence-based grading, source citations, automatic knowledge-gap detection, answer editing/resubmission, and readiness scores calculated from reviewed results. This remains a frontend-only demo workflow, not an auditable server review.
-- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/lib/quick-flow-store.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched the changed files from GitHub and checked legacy localStorage normalization, answer-review state, manager review actions, required gap feedback, reviewer attribution, and incoming-member feedback rendering. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept the feature frontend-only and manual; the UI explicitly does not claim AI grading. Existing demo authentication, sample data, role navigation, and localStorage persistence remain.
 - **Next action:** Improve the knowledge-source management interactions, keeping all integrations simulated until a separate backend task is approved.
@@ -252,7 +252,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Incoming-member verification progress and feedback
 - **Completed:** Incoming members now see an overall verification progress summary and individual progress cards for each approved handover assigned to them. Cards show answered/total counts, completion state, and Start/Continue/Review actions. The verification dialog shows per-handover progress, a saved-answer history with timestamps, a clear current question count, and completion messaging. Answer submissions are checked against an approved handover assigned to that person and duplicate answers are blocked.
 - **Still pending:** AI/evidence-based grading, explanations and citations, question types, manager review of answer quality, and readiness scores calculated from actual results. The workflow remains a localStorage-backed demo.
-- **Files changed:** `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/lib/quick-connect-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/components/qc/Sections.tsx`, `src/components/qc/dialogs.tsx`, `src/lib/quick-flow-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched the updated files and checked progress calculations, person/handover scoping, saved-answer rendering, submission validation, duplicate prevention, and tracker entries. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Did not imply that answers are AI-graded. The UI explicitly describes responses as saved for manager review; no backend or AI integration was added.
 - **Next action:** Add a manager-facing review view for incoming-member answers, with a way to mark knowledge gaps and provide feedback.
@@ -261,7 +261,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Outgoing handover edit and resubmission
 - **Completed:** Outgoing members can edit the knowledge questions and answers on a handover marked Changes requested, then save and resubmit it. Resubmission returns the handover to Pending approval, retains prior review comments/history, and adds an activity entry attributed to the outgoing member. The store only accepts resubmission from the handover owner while the status is Changes requested.
 - **Still pending:** Adding/removing knowledge items, a richer chronological review timeline, and automated lifecycle tests. Persistence remains browser localStorage.
-- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/lib/quick-flow-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched source files and checked the owner/status guard, trimmed question/answer validation, status reset, activity attribution, and edit/resubmit UI. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept the workflow frontend-only and preserved demo authentication, sample data, and localStorage. Rejected and approved handovers remain non-editable.
 - **Next action:** Complete the incoming-member verification flow with clearer per-handover progress and feedback states.
@@ -270,7 +270,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Manager handover review workflow
 - **Completed:** Expanded handover statuses to include Changes requested and Rejected. Added manager review comments, request-changes and reject actions, retained approval attribution, and recorded review history in local app state. Latest manager feedback is visible on the handover row to the handover owner. Existing saved browser data is normalized with an empty review history when the new field is absent.
 - **Still pending:** Outgoing members cannot yet edit and resubmit the handover content after a change request; review history is localStorage-backed and is not a server audit log. Add explicit resubmission and richer review timeline in a later frontend task.
-- **Files changed:** `src/lib/data.ts`, `src/lib/quick-connect-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/lib/data.ts`, `src/lib/quick-flow-store.tsx`, `src/components/qc/Sections.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Re-fetched source files from GitHub and checked the new status model, review actions, persistence compatibility, and feedback rendering. Build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept the workflow frontend-only with localStorage persistence. Existing demo authentication and sample data remain. Role checks are UI controls, not server authorization.
 - **Next action:** Add an outgoing-member edit and resubmit path for handovers marked Changes requested, then validate the full lifecycle.
@@ -288,7 +288,7 @@ Copy this template into the session log after each build session:
 ### 2026-11-08 — Frontend demo identity consistency
 - **Completed:** Dashboard greeting now uses the active demo user. Handover approval records and its activity entry now use the active demo user instead of a fixed sample admin.
 - **Still pending:** Broader frontend audit, role-specific workflow review, and responsive/error-state validation.
-- **Files changed:** `src/components/qc/Dashboard.tsx`, `src/components/qc/Sections.tsx`, `src/lib/quick-connect-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Files changed:** `src/components/qc/Dashboard.tsx`, `src/components/qc/Sections.tsx`, `src/lib/quick-flow-store.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
 - **Checks:** Source-level review only; build, lint, and automated tests were not run because no repository terminal/runtime was available.
 - **Decisions / blockers:** Kept the existing demo authentication, role switching, UI layout, sample data, and localStorage persistence. No backend or Supabase work was performed.
 - **Next action:** Continue the frontend audit with the next highest-impact role-specific workflow inconsistency.
@@ -329,3 +329,11 @@ Copy this template into the session log after each build session:
 ---
 
 **Rule:** Every AI coding tool that changes this project must update this tracker in the same session. If work is incomplete, mark it as in progress or pending and leave a precise next action.
+
+
+### 2026-11-09 — Project-wide QuickFlow rename
+- **Completed:** Renamed the shared application store file, provider, context, API types, hook, storage-key namespace, auth storage-key namespace, and all source imports from QuickConnect to QuickFlow. Updated project documentation and historical naming references.
+- **Files changed:** `src/lib/quick-flow-store.tsx`, `src/lib/auth-store.tsx`, `src/routes/__root.tsx`, `src/components/qc/AppShell.tsx`, `src/components/qc/Sections.tsx`, `src/components/qc/Dashboard.tsx`, `src/components/qc/dialogs.tsx`, `README.md`, `docs/OVERVIEW.md`, `docs/DATABASE-DESIGN.md`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Not run from this GitHub-only editing session.
+- **Remaining:** The GitHub repository slug is still `QuickConnect`; rename it in GitHub repository Settings when ready. The README clone URL remains unchanged until then.
+- **Next action:** Run install/build/lint/tests locally and check browser demo state after the storage-key namespace change.
