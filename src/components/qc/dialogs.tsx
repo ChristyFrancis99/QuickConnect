@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { people, personById, sources } from "@/lib/data";
 import { Avatar, AiAvatar, Bar, Pill, readinessLabel, readinessTone } from "./primitives";
 import { useUI } from "./ui-context";
-import { useQuickFlow } from "@/lib/quick-flow-store";
+import { useQuickConnect } from "@/lib/quick-connect-store";
 import { useAuth } from "@/lib/auth-store";
 
 export type DialogState =
@@ -35,7 +35,7 @@ export function Dialogs({ state, close }: { state: DialogState; close: () => voi
 function Profile({ id }: { id: string }) {
   const p = personById(id);
   const ui = useUI();
-  const { projects, verification } = useQuickFlow();
+  const { projects, verification } = useQuickConnect();
   const v = verification.find((x) => x.who === id);
   return (
     <>
@@ -76,7 +76,7 @@ function Profile({ id }: { id: string }) {
 }
 
 function ProjectDetail({ id }: { id: string }) {
-  const { projects } = useQuickFlow();
+  const { projects } = useQuickConnect();
   const p = projects.find((x) => x.id === id);
   if (!p) {
     return (
@@ -118,7 +118,7 @@ function ProjectDetail({ id }: { id: string }) {
 }
 
 function HandoverWizard({ close }: { close: () => void }) {
-  const { projects, addHandover } = useQuickFlow();
+  const { projects, addHandover } = useQuickConnect();
   const { user, roleCategory } = useAuth();
   const [step, setStep] = useState(0);
   const [project, setProject] = useState("pay");
@@ -212,7 +212,7 @@ function Verify({ id, close }: { id: string; close: () => void }) {
   const p = personById(id);
   const [answer, setAnswer] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { handovers, answers, answerReviews, submitAnswer } = useQuickFlow();
+  const { handovers, answers, answerReviews, submitAnswer } = useQuickConnect();
   const approvedHandovers = handovers.filter((item) => item.status === "Approved" && item.to === id);
   const questions = approvedHandovers.flatMap((handover) =>
     handover.knowledge.map((item) => ({ ...item, handoverId: handover.id, project: handover.project })),
