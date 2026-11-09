@@ -6,7 +6,7 @@
 
 Choose and configure a database/authentication provider explicitly before implementation. Keep provider credentials in environment variables or a managed secrets store, never in source control. Create schema changes as versioned migrations using the selected provider's supported tooling. This document is a provider-neutral implementation specification; it is not evidence that a database is connected.
 
-The current repository uses React + TanStack Start. The existing `src/lib/auth-store.tsx` and `src/lib/quick-connect-store.tsx` use demo people and browser `localStorage`. Keep those prototype flows clearly separated until a server-backed implementation is verified.
+The current repository uses React + TanStack Start. The existing `src/lib/auth-store.tsx` and `src/lib/quick-flow-store.tsx` use demo people and browser `localStorage`. Keep those prototype flows clearly separated until a server-backed implementation is verified.
 
 ## 2. Initial relational model
 
