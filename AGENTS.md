@@ -1,6 +1,6 @@
 # Repository guidance
 
-- Preserve the existing KnowFlow product UI and working prototype workflows unless the task explicitly requests a change.
+- Preserve the existing QuickFlow product UI and working prototype workflows unless the task explicitly requests a change.
 - Read `docs/OVERVIEW.md` and `docs/IMPLEMENTED-VS-PENDING.md` before substantial implementation work.
 - Update `docs/IMPLEMENTED-VS-PENDING.md` after each meaningful implementation session. Record files changed, checks run, blockers, and the next action.
 - Never commit credentials, API keys, tokens, or other secrets.
