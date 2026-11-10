@@ -2,7 +2,7 @@
 
 > **This is the project handover log for developers and AI coding tools.** Update it after every meaningful implementation session so work can resume even if an AI tool runs out of credits or a session ends.
 
-**Last reviewed:** 2026-11-08  
+**Last reviewed:** 2026-11-11  
 **Current baseline:** Repository code on `main` at the time this file was created.  
 **Status rule:** A screen/demo interaction is not the same as a production integration. Keep those statuses separate.
 
@@ -46,6 +46,8 @@
 - [x] Incoming-member verification progress by approved handover, saved-answer history, and completion states (frontend prototype; no AI grading).
 - [x] Verification answer submission state in the app store.
 - [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
+- [x] Knowledge Verification Workspace with persisted assessments, multiple-choice scoring, descriptive-answer manager review, clarification states, and readiness integration (frontend prototype; no backend or AI grading).
+- [x] Knowledge Risk Radar with deterministic documentation, ownership, handover, verification, and readiness risks; explainable priority scores; filters; detail evidence; and persisted mitigation workflow (frontend prototype).
 - [x] Activity feed and settings preference UI.
 - [x] Persist browser-local settings preferences with validated defaults, controlled switches, and read/write error feedback (frontend demo; no real notification delivery).
 - [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, AI finding statuses, knowledge-source demo state, and activity.
@@ -87,11 +89,11 @@
 - [ ] Generate a structured handover draft from approved project sources.
 - [x] Let outgoing members edit knowledge questions and answers after a manager requests changes, then resubmit for approval (frontend prototype).
 - [x] Add manager review comments, requested changes, approval/rejection, and local review history (frontend prototype; not a server audit log).
-- [ ] Generate incoming-member questions from approved claims and source permissions.
+- [x] Generate deterministic demo questions from approved handover knowledge (source-backed question generation remains pending).
 - [ ] Support recall, reasoning, scenario, and uncertainty question types.
 - [ ] Evaluate free-text answers against source-backed evidence.
 - [ ] Provide explanations, citations, follow-up questions, and weak-area feedback.
-- [ ] Update readiness scores from actual verification results rather than sample percentages.
+- [x] Update frontend readiness progress and status from assessment answers and review outcomes (production evidence-backed readiness remains pending).
 - [ ] Give managers a readiness report showing gaps, evidence, and recommended next actions.
 - [x] Add a manager-facing review queue for submitted verification answers, with reviewed/knowledge-gap states and feedback returned to the incoming member (frontend prototype).
 
@@ -113,8 +115,8 @@
 | Knowledge sources | Sample source records with localStorage-backed demo connect/disconnect and simulated refresh controls; no live connectors or external account access verified. |
 | AI analysis | Sample findings in UI; no live ingestion or AI analysis verified. |
 | Handover | Local prototype state; not yet a server-backed, auditable workflow. |
-| Verification | UI and local answer state; no complete evidence-based grading pipeline verified. |
-| Readiness | Sample percentages; not yet calculated from a production verification engine. |
+| Verification | Deterministic local assessment questions, automatic multiple-choice scoring, and manual descriptive review; no AI/evidence-based grading or server persistence. |
+| Readiness | Frontend assessment progress and review status are calculated locally; no production verification engine or evidence-backed scoring. |
 | Permissions | Role metadata exists in the client; server-side enforcement is pending. |
 
 ## 5. Next build sequence
@@ -181,6 +183,30 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-10 — Knowledge Verification Workspace
+- **Completed:** Repaired the existing assessment implementation instead of replacing it. Assessments now retain handover/project/member associations, typed question points and topics, response marks/review metadata, safe per-record localStorage validation, editable pre-submission answers, duplicate-submission protection, marks-based scoring, clarification-driven improvement status, manager review updates, and readiness progress derived from assessment answers.
+- **Still pending:** Questions are deterministic demo questions, descriptive grading is manual, persistence is browser-local, and no production backend, AI grading, citations, or external integrations are implemented.
+- **Files changed:** `src/lib/assessment-store.tsx`, `src/components/qc/AssessmentWorkspace.tsx`, `src/components/qc/Sections.tsx`, `src/test/assessment-store.test.ts`, `src/test/settings-preferences.component.test.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** Full Vitest suite passed with one worker (23/23); targeted assessment tests passed (3/3); production build passed with `NODE_OPTIONS=--max-old-space-size=4096`; `git diff --check` passed. The default parallel test/build commands exceeded this environment's Node memory limit. TypeScript emitted no diagnostics for changed assessment files; unrelated baseline diagnostics remain elsewhere in the repository.
+- **Decisions / blockers:** Preserved the existing provider architecture, handover approval/revision workflows, UI styling, and generated route file. The Settings component test was updated to include the already-required `AssessmentProvider`.
+- **Next action:** Manually walk through an approved handover as Alex, submit both question types, then review the descriptive response as Christy and confirm the Readiness status and localStorage restoration.
+
+### 2026-11-11 — Knowledge Risk Radar
+- **Completed:** Added a Project Manager and Organisation Admin radar section. Risks are deterministically detected from incomplete handovers, overdue pending handovers, unresolved assessments, legacy knowledge-gap reviews, ownerless sample findings, and incomplete approved-handover readiness. The register supports severity/project/category/status filters, title and explanation search, evidence and mitigation detail, owner assignment, notes, status changes, reopening, resolution history, stable deduplication, and browser-local persistence.
+- **Still pending:** This remains a frontend demo. It does not query live connectors, run AI analysis, create server audit records, or provide production alerts/work queues.
+- **Files changed:** `src/lib/risk-store.tsx`, `src/components/qc/KnowledgeRiskRadar.tsx`, `src/components/qc/AppShell.tsx`, `src/components/qc/Sections.tsx`, `src/lib/data.ts`, `src/routes/__root.tsx`, `src/routes/$section.tsx`, `src/lib/quick-connect-store.tsx`, `src/test/risk-store.test.ts`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Detection/scoring rules:** Documentation risks use handovers with fewer than two knowledge items; overdue risks use scheduled dates before the current date while not approved; verification risks use awaiting-review or needs-improvement assessments and explicitly flagged legacy gaps; ownership risks use existing sample findings mentioning missing owners; readiness risks use approved handovers without Verified assessments. Priority is `severity base + impact + urgency + knowledge availability`, capped at 100.
+- **Checks:** Targeted risk tests passed (7/7); full Vitest suite passed with one worker (30/30); production build passed with `NODE_OPTIONS=--max-old-space-size=4096`; targeted ESLint was blocked by repository CRLF/Prettier formatting errors in legacy and newly touched files; full TypeScript output still contains pre-existing diagnostics outside the radar files; `git diff --check` passed.
+- **Next action:** Sign in as Christy or a Project Manager, open **Knowledge Risk Radar**, assign an owner, save mitigation notes, move a risk to Resolved, refresh the page, then reopen it to verify the persisted history.
+
+### 2026-11-10 — Handover activity actor attribution
+- **Completed:** Updated handover creation to accept an explicit activity actor and passed the authenticated demo user's ID from the handover wizard. Handover creation still preserves its generated knowledge, `Pending approval` status, and project activity text; approval, revision, and resubmission workflows remain unchanged.
+- **Still pending:** Activity attribution remains frontend-local demo state until server-backed audit events are implemented.
+- **Files changed:** `src/lib/quick-connect-store.tsx`, `src/components/qc/dialogs.tsx`, `src/test/quick-connect-store.test.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** `npm run test` passed (20/20); new regression test passed targeted ESLint; implementation-file ESLint is blocked by pre-existing CRLF/Prettier errors in the legacy files; `npm run build` passed; `git diff --check` passed.
+- **Decisions / blockers:** Kept the selected outgoing member separate from the logged-in actor. No generated routes, Settings behavior, authentication, backend, or external integrations were changed.
+- **Next action:** Manually walk through Alex and Christy handover creation in the development browser and confirm the Activity feed actor names.
 
 ### 2026-11-10 — Settings component interaction tests
 - **Completed:** Added React Testing Library and Vitest coverage for the Settings interface as the Organisation Admin demo role. Tests verify default switch states, independent toggling, successful save feedback, localStorage write-failure feedback, and restoration after remount. The test uses an in-memory browser storage shim because the current Node/jsdom runtime does not expose localStorage.

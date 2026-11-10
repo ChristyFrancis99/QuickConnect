@@ -177,6 +177,7 @@ export const navItems = [
   { slug: "handovers", label: "Handover Reports" },
   { slug: "verification", label: "Knowledge Verification" },
   { slug: "readiness", label: "Readiness Reports" },
+  { slug: "risk-radar", label: "Knowledge Risk Radar" },
   { slug: "activity", label: "Activity & History" },
   { slug: "settings", label: "Settings" },
 ] as const;

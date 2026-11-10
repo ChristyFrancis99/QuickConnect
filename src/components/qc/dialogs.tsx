@@ -198,7 +198,7 @@ function HandoverWizard({ close }: { close: () => void }) {
                 { question: `Which knowledge sources were selected for ${selectedProject.name}?`, answer: picked.length ? picked.join(", ") : "No external sources were selected; use the project description as the handover source." },
                 { question: `Who is handing over ${selectedProject.name} to ${personById(to).name}?`, answer: `${personById(from).name} is the outgoing team member.` },
               ],
-            });
+            }, user.id);
             toast.success("Handover created and saved. It is awaiting approval.");
             close();
           }}>Create handover</Button>

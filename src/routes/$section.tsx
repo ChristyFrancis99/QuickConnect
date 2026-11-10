@@ -11,6 +11,7 @@ const subtitles: Record<string, string> = {
   handovers: "Scheduled and in-progress handover reports.",
   verification: "Check how well incoming members understand their work.",
   readiness: "Readiness scores for incoming team members.",
+  "risk-radar": "Explainable risks found across knowledge handovers and verification.",
   activity: "Everything that happened recently.",
   settings: "Notifications and preferences.",
 };
