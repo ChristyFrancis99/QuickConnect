@@ -48,6 +48,7 @@
 - [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
 - [x] Knowledge Verification Workspace with persisted assessments, multiple-choice scoring, descriptive-answer manager review, clarification states, and readiness integration (frontend prototype; no backend or AI grading).
 - [x] Knowledge Risk Radar with deterministic documentation, ownership, handover, verification, and readiness risks; explainable priority scores; filters; detail evidence; and persisted mitigation workflow (frontend prototype).
+- [x] Project Continuity Timeline with recorded handover, verification, risk, and project event history, project summaries, search/date/category filters, role-aware visibility, and browser-local persistence (frontend prototype).
 - [x] Activity feed and settings preference UI.
 - [x] Persist browser-local settings preferences with validated defaults, controlled switches, and read/write error feedback (frontend demo; no real notification delivery).
 - [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, AI finding statuses, knowledge-source demo state, and activity.
@@ -117,6 +118,7 @@
 | Handover | Local prototype state; not yet a server-backed, auditable workflow. |
 | Verification | Deterministic local assessment questions, automatic multiple-choice scoring, and manual descriptive review; no AI/evidence-based grading or server persistence. |
 | Readiness | Frontend assessment progress and review status are calculated locally; no production verification engine or evidence-backed scoring. |
+| Continuity timeline | Records actions from local demo workflows only; no server audit log, external event ingestion, or historical events are invented. |
 | Permissions | Role metadata exists in the client; server-side enforcement is pending. |
 
 ## 5. Next build sequence
@@ -199,6 +201,14 @@ Copy this template into the session log after each build session:
 - **Detection/scoring rules:** Documentation risks use handovers with fewer than two knowledge items; overdue risks use scheduled dates before the current date while not approved; verification risks use awaiting-review or needs-improvement assessments and explicitly flagged legacy gaps; ownership risks use existing sample findings mentioning missing owners; readiness risks use approved handovers without Verified assessments. Priority is `severity base + impact + urgency + knowledge availability`, capped at 100.
 - **Checks:** Targeted risk tests passed (7/7); full Vitest suite passed with one worker (30/30); production build passed with `NODE_OPTIONS=--max-old-space-size=4096`; targeted ESLint was blocked by repository CRLF/Prettier formatting errors in legacy and newly touched files; full TypeScript output still contains pre-existing diagnostics outside the radar files; `git diff --check` passed.
 - **Next action:** Sign in as Christy or a Project Manager, open **Knowledge Risk Radar**, assign an owner, save mitigation notes, move a risk to Resolved, refresh the page, then reopen it to verify the persisted history.
+
+### 2026-11-11 — Project Continuity Timeline
+- **Completed:** Added the role-aware **Continuity Timeline** sidebar section for incoming members, project managers, and organisation admins. The timeline records actual handover creation, approval/rejection/change requests/resubmissions, assessment starts/submissions, manager acceptance or clarification requests, risk detection, ownership changes, mitigation, resolution, acceptance, and reopening. It provides project selection, newest-first ordering, actor/date display, search, category/date filters, expandable related-record details, and project continuity summaries.
+- **Still pending:** This is browser-local frontend history. It does not import historical activity, create production audit logs, ingest external source events, or fabricate events for actions that happened before timeline recording was added.
+- **Files changed:** `src/lib/timeline-store.tsx`, `src/components/qc/ContinuityTimeline.tsx`, `src/routes/__root.tsx`, `src/lib/data.ts`, `src/components/qc/AppShell.tsx`, `src/components/qc/Sections.tsx`, `src/routes/$section.tsx`, `src/lib/quick-connect-store.tsx`, `src/lib/assessment-store.tsx`, `src/lib/risk-store.tsx`, `src/test/timeline-store.test.ts`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Persistence:** Events use `quickconnect.timeline.v1`; malformed JSON and invalid records are ignored safely, event IDs are stable/deduplicated, and provider-independent store tests remain supported.
+- **Checks:** Timeline/risk tests passed (9/9); full Vitest suite passed with one worker (32/32); production build passed with `NODE_OPTIONS=--max-old-space-size=4096`; `git diff --check` passed. Targeted ESLint reports repository CRLF/Prettier formatting issues in touched files.
+- **Next action:** Sign in as Christy, open **Continuity Timeline**, create and approve a handover, then submit/review an assessment and update a risk to confirm each action appears once with the correct actor and project.
 
 ### 2026-11-10 — Handover activity actor attribution
 - **Completed:** Updated handover creation to accept an explicit activity actor and passed the authenticated demo user's ID from the handover wizard. Handover creation still preserves its generated knowledge, `Pending approval` status, and project activity text; approval, revision, and resubmission workflows remain unchanged.

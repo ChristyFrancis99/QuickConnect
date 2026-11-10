@@ -15,6 +15,7 @@ import { QuickConnectProvider } from "@/lib/quick-connect-store";
 import { AuthProvider } from "@/lib/auth-store";
 import { AssessmentProvider } from "@/lib/assessment-store";
 import { RiskProvider } from "@/lib/risk-store";
+import { TimelineProvider } from "@/lib/timeline-store";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -118,17 +119,19 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <QuickConnectProvider>
-          <AssessmentProvider>
-            <RiskProvider>
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </RiskProvider>
-          </AssessmentProvider>
-        </QuickConnectProvider>
-        <Toaster />
-      </AuthProvider>
+      <TimelineProvider>
+        <AuthProvider>
+          <QuickConnectProvider>
+            <AssessmentProvider>
+              <RiskProvider>
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </RiskProvider>
+            </AssessmentProvider>
+          </QuickConnectProvider>
+          <Toaster />
+        </AuthProvider>
+      </TimelineProvider>
     </QueryClientProvider>
   );
 }

@@ -12,6 +12,7 @@ const subtitles: Record<string, string> = {
   verification: "Check how well incoming members understand their work.",
   readiness: "Readiness scores for incoming team members.",
   "risk-radar": "Explainable risks found across knowledge handovers and verification.",
+  timeline: "Chronological evidence of project continuity events.",
   activity: "Everything that happened recently.",
   settings: "Notifications and preferences.",
 };

@@ -13,6 +13,7 @@ import { usePreferences, type PreferenceKey } from "@/lib/preferences";
 import { useAssessment, statusLabel, statusTone, deriveAssessmentStatus } from "@/lib/assessment-store";
 import { AssessmentWorkspace, AssessmentCard, ManagerAssessmentReviewPanel } from "./AssessmentWorkspace";
 import { KnowledgeRiskRadar } from "./KnowledgeRiskRadar";
+import { ContinuityTimeline } from "./ContinuityTimeline";
 
 const preferenceOptions: { label: string; key: PreferenceKey }[] = [
   { label: "Email me when a handover is due", key: "handoverDueNotifications" },
@@ -38,14 +39,16 @@ export function SectionView({ slug }: { slug: string }) {
   const allowedSections: Record<string, string[]> = {
     "Outgoing Member": ["projects", "handovers", "activity"],
     "Incoming Member": ["projects", "verification", "activity"],
-    "Project Manager": ["projects", "team", "handovers", "verification", "readiness", "risk-radar", "activity"],
-    "Organisation Admin": ["projects", "team", "sources", "analysis", "handovers", "verification", "readiness", "risk-radar", "activity", "settings"],
+    "Project Manager": ["projects", "team", "handovers", "verification", "readiness", "risk-radar", "timeline", "activity"],
+    "Organisation Admin": ["projects", "team", "sources", "analysis", "handovers", "verification", "readiness", "risk-radar", "timeline", "activity", "settings"],
   };
   if (!allowedSections[roleCategory]?.includes(slug)) {
     return <Card><p className="font-semibold">This section is not available for your demo role.</p><p className="mt-1 text-sm text-muted-foreground">Switch to a role with access to continue.</p></Card>;
   }
 
   switch (slug) {
+    case "timeline":
+      return <ContinuityTimeline />;
     case "risk-radar":
       return <KnowledgeRiskRadar />;
     case "projects":
