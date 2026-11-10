@@ -9,10 +9,18 @@ import { AiAvatar, Avatar, Bar, Card, Pill, readinessLabel, readinessTone } from
 import { useUI } from "./ui-context";
 import { useAuth } from "@/lib/auth-store";
 import { useQuickConnect } from "@/lib/quick-connect-store";
+import { usePreferences, type PreferenceKey } from "@/lib/preferences";
+
+const preferenceOptions: { label: string; key: PreferenceKey }[] = [
+  { label: "Email me when a handover is due", key: "handoverDueNotifications" },
+  { label: "Alert on single-person knowledge risks", key: "knowledgeRiskAlerts" },
+  { label: "Weekly readiness digest", key: "weeklyReadinessDigest" },
+];
 
 export function SectionView({ slug }: { slug: string }) {
   const ui = useUI();
   const { user, roleCategory } = useAuth();
+  const { preferences, updatePreference, loadError, saveError } = usePreferences();
   const { projects, sources: knowledgeSources, connectSource, disconnectSource, simulateSourceSync, handovers, activities, verification, answers, approvals, reviews, answerReviews, aiFindings, updateAiFindingStatus, approveHandover, reviewHandover, resubmitHandover, reviewAnswer } = useQuickConnect();
   const visibleHandovers = handovers.filter((handover) => roleCategory !== "Outgoing Member" || handover.from === user.id);
   const [reviewDrafts, setReviewDrafts] = useState<Record<string, string>>({});
@@ -509,9 +517,30 @@ export function SectionView({ slug }: { slug: string }) {
     case "settings":
       return (
         <Card className="max-w-xl space-y-5">
-          {["Email me when a handover is due", "Alert on single-person knowledge risks", "Weekly readiness digest"].map((l, i) => (
-            <label key={l} className="flex items-center justify-between gap-4 text-sm">{l}<Switch defaultChecked={i !== 2} onCheckedChange={() => toast.success("Preference saved")} /></label>
+          <div>
+            <p className="font-semibold">Browser-local demo preferences</p>
+            <p className="mt-1 text-xs text-muted-foreground">These settings are saved only in this browser. They do not send real emails or deliver notifications.</p>
+          </div>
+          {preferenceOptions.map(({ label, key }) => (
+            <label key={key} className="flex items-center justify-between gap-4 text-sm">
+              {label}
+              <Switch
+                checked={preferences[key]}
+                onCheckedChange={(checked) => {
+                  if (updatePreference(key, checked)) {
+                    toast.success("Browser-local preference saved.");
+                  } else {
+                    toast.error("Could not save this browser-local preference.");
+                  }
+                }}
+              />
+            </label>
           ))}
+          {(loadError || saveError) && (
+            <p className="text-xs text-danger">
+              {saveError ? "A preference could not be saved in this browser." : "Saved preferences could not be read; default values are shown."}
+            </p>
+          )}
         </Card>
       );
     default:

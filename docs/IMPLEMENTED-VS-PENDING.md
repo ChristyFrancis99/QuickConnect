@@ -47,6 +47,7 @@
 - [x] Verification answer submission state in the app store.
 - [x] Manager review of submitted answers, manual knowledge-gap flags, and feedback visible to incoming members (frontend prototype; no AI grading).
 - [x] Activity feed and settings preference UI.
+- [x] Persist browser-local settings preferences with validated defaults, controlled switches, and read/write error feedback (frontend demo; no real notification delivery).
 - [x] Browser localStorage persistence for dashboard data, handovers, approvals, answers, AI finding statuses, knowledge-source demo state, and activity.
 
 ## 3. Pending — highest priority
@@ -180,6 +181,22 @@ Copy this template into the session log after each build session:
 ```
 
 ## 7. Session log
+
+### 2026-11-10 — Settings component interaction tests
+- **Completed:** Added React Testing Library and Vitest coverage for the Settings interface as the Organisation Admin demo role. Tests verify default switch states, independent toggling, successful save feedback, localStorage write-failure feedback, and restoration after remount. The test uses an in-memory browser storage shim because the current Node/jsdom runtime does not expose localStorage.
+- **Still pending:** Browser-level visual testing and production/server-backed preferences remain pending.
+- **Files changed:** `src/test/settings-preferences.component.test.tsx`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** `npm run test` passed (16/16); targeted ESLint passed for `src/test/settings-preferences.test.ts` and `src/test/settings-preferences.component.test.tsx`; `npm run build` passed; `git diff --check` passed.
+- **Decisions / blockers:** No production preference implementation was changed. The test mocks only the `sonner` notification dependency and uses the existing application providers.
+- **Next action:** Manually verify the Settings interaction and persistence in a development browser.
+
+### 2026-11-10 — Persistent settings preferences
+- **Completed:** Replaced uncontrolled settings switches with validated, browser-local preferences for handover due reminders, knowledge risk alerts, and the weekly readiness digest. Preferences load safely on the client, merge partial saved objects with defaults, persist each toggle independently, and report storage failures without crashing. The settings UI now identifies these as demo-only browser preferences and does not imply real notification delivery.
+- **Still pending:** Real notification delivery, server-backed preference persistence, and authenticated organisation-level settings remain pending.
+- **Files changed:** `src/lib/preferences.ts`, `src/components/qc/Sections.tsx`, `src/test/settings-preferences.test.ts`, `docs/IMPLEMENTED-VS-PENDING.md`.
+- **Checks:** `npm run test` passed (11/11); targeted ESLint passes for the new preference helper and tests but reports existing CRLF/Prettier errors in `src/components/qc/Sections.tsx`; `npm run build` passed; `git diff --check` passed.
+- **Decisions / blockers:** Kept storage access client-only and did not modify authentication, backend integrations, database files, or generated routes. Existing unrelated worktree changes were preserved.
+- **Next action:** Manually verify toggle persistence across a browser refresh in the development browser.
 
 ### 2026-11-08 — Frontend interaction polish, button tactile feedback & responsive bug fixing
 - **Completed:**
