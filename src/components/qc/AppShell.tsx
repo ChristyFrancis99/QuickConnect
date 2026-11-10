@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Activity, BarChart3, Bell, BrainCircuit, ChevronDown, Database, FileText, FolderKanban,
-  LayoutDashboard, Menu, Moon, Search, Settings, ShieldCheck, Sun, Users, Link2,
+  LayoutDashboard, Menu, Moon, Search, Settings, ShieldCheck, ShieldAlert, Sun, Users, Link2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -18,13 +18,13 @@ import { ActivityPanel } from "./Dashboard";
 const roleNavigation: Record<string, string[]> = {
   "Outgoing Member": ["dashboard", "projects", "handovers", "activity"],
   "Incoming Member": ["dashboard", "projects", "verification", "activity"],
-  "Project Manager": ["dashboard", "projects", "team", "handovers", "verification", "readiness", "activity"],
+  "Project Manager": ["dashboard", "projects", "team", "handovers", "verification", "readiness", "risk-radar", "activity"],
   "Organisation Admin": navItems.map((item) => item.slug),
 };
 
 const icons = {
   dashboard: LayoutDashboard, projects: FolderKanban, team: Users, sources: Database, analysis: BrainCircuit,
-  handovers: FileText, verification: ShieldCheck, readiness: BarChart3, activity: Activity, settings: Settings,
+  handovers: FileText, verification: ShieldCheck, readiness: BarChart3, "risk-radar": ShieldAlert, activity: Activity, settings: Settings,
 };
 
 function Logo() {

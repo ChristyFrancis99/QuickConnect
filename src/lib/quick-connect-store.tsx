@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { toast } from "sonner";
 import {
   activities as initialActivities,
-  currentUser,
   handovers as initialHandovers,
   projects as initialProjects,
   sources as initialSources,
@@ -65,7 +64,7 @@ type AiFinding = {
   status: "Open" | "In Progress" | "Resolved";
 };
 
-type QuickConnectData = {
+export type QuickConnectData = {
   projects: Project[];
   sources: KnowledgeSource[];
   handovers: Handover[];
@@ -79,7 +78,7 @@ type QuickConnectData = {
 };
 
 type QuickConnectApi = QuickConnectData & {
-  addHandover: (handover: Omit<Handover, "id" | "status">) => void;
+  addHandover: (handover: Omit<Handover, "id" | "status">, actorId: string) => void;
   approveHandover: (id: string, approvedBy: string) => void;
   reviewHandover: (id: string, reviewerId: string, action: "changes_requested" | "rejected", comment: string) => void;
   resubmitHandover: (id: string, memberId: string, knowledge: Handover["knowledge"]) => void;
@@ -220,7 +219,7 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
 
   const api = useMemo<QuickConnectApi>(() => ({
     ...data,
-    addHandover: (handover) => {
+    addHandover: (handover, actorId) => {
       const newHandover: Handover = {
         ...handover,
         id: crypto.randomUUID(),
@@ -229,7 +228,7 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
       setData((current) => ({
         ...current,
         handovers: [newHandover, ...current.handovers],
-        activities: [activity(currentUser.id, `created a handover for ${newHandover.project}`), ...current.activities],
+        activities: [activity(actorId, `created a handover for ${newHandover.project}`), ...current.activities],
       }));
     },
     reviewHandover: (id, reviewerId, action, comment) => {

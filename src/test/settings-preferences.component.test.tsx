@@ -3,6 +3,7 @@ import { SectionView } from "@/components/qc/Sections";
 import { AuthProvider } from "@/lib/auth-store";
 import { PREFERENCES_STORAGE_KEY } from "@/lib/preferences";
 import { QuickConnectProvider } from "@/lib/quick-connect-store";
+import { AssessmentProvider } from "@/lib/assessment-store";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -50,7 +51,9 @@ function renderSettings() {
     <UICtx.Provider value={ui}>
       <AuthProvider>
         <QuickConnectProvider>
-          <SectionView slug="settings" />
+          <AssessmentProvider>
+            <SectionView slug="settings" />
+          </AssessmentProvider>
         </QuickConnectProvider>
       </AuthProvider>
     </UICtx.Provider>,

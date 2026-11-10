@@ -13,6 +13,8 @@ import { type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { QuickConnectProvider } from "@/lib/quick-connect-store";
 import { AuthProvider } from "@/lib/auth-store";
+import { AssessmentProvider } from "@/lib/assessment-store";
+import { RiskProvider } from "@/lib/risk-store";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -118,8 +120,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <QuickConnectProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          <AssessmentProvider>
+            <RiskProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </RiskProvider>
+          </AssessmentProvider>
         </QuickConnectProvider>
         <Toaster />
       </AuthProvider>
