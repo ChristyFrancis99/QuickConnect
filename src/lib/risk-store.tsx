@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Assessment, AssessmentAnswerReview } from "./assessment-store";
-import { deriveAssessmentStatus, useAssessment } from "./assessment-store";
+import { deriveAssessmentStatus, useOptionalAssessment } from "./assessment-store";
 import type { Handover, Project } from "./data";
 import { useQuickConnect, type QuickConnectData } from "./quick-connect-store";
+import { useOptionalTimeline } from "./timeline-store";
 
 export type RiskSeverity = "Critical" | "High" | "Medium" | "Low";
 export type RiskCategory =
@@ -345,7 +346,12 @@ const RiskContext = createContext<RiskApi | null>(null);
 
 export function RiskProvider({ children }: { children: ReactNode }) {
   const { projects, handovers, answers, answerReviews, aiFindings } = useQuickConnect();
-  const { assessments, reviews } = useAssessment();
+  const assessmentContext = useOptionalAssessment();
+  const assessments = assessmentContext?.assessments ?? [];
+  const reviews = assessmentContext?.reviews ?? [];
+  const timeline = useOptionalTimeline();
+  const events = timeline?.events ?? [];
+  const recordEvent = timeline?.recordEvent ?? (() => {});
   const [mitigations, setMitigations] = useState<Record<string, RiskMitigation>>({});
   const [loaded, setLoaded] = useState(false);
 
@@ -364,6 +370,22 @@ export function RiskProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
+    for (const risk of detected) {
+      if (events.some((event) => event.id === `risk-detected:${risk.id}`)) continue;
+      recordEvent({
+        id: `risk-detected:${risk.id}`,
+        projectId: risk.projectId,
+        category: "Knowledge risks",
+        type: "risk_detected",
+        title: "Knowledge risk detected",
+        description: risk.title,
+        actorId: "system",
+        riskId: risk.id,
+      });
+    }
+  }, [detected, events, recordEvent]);
+
+  useEffect(() => {
     if (!loaded) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mitigations));
@@ -375,7 +397,38 @@ export function RiskProvider({ children }: { children: ReactNode }) {
   const api = useMemo<RiskApi>(() => ({
     risks,
     updateRisk: (id, update) => {
-      setMitigations((current) => updateRiskMitigation(current, id, update));
+      setMitigations((current) => {
+        const next = updateRiskMitigation(current, id, update);
+        const risk = risks.find((item) => item.id === id);
+        if (risk) {
+          if (update.ownerId !== undefined && update.ownerId !== risk.assignedOwnerId) {
+            recordEvent({
+              id: `risk-owner:${id}:${update.ownerId ?? "unassigned"}`,
+              projectId: risk.projectId,
+              category: "Knowledge risks",
+              type: "risk_owner_changed",
+              title: "Risk owner changed",
+              description: update.ownerId ? "A responsible owner was assigned." : "The risk was unassigned.",
+              actorId: update.actorId,
+              riskId: id,
+            });
+          }
+          if (update.status && update.status !== risk.status) {
+            const type = update.status === "Resolved" ? "risk_resolved" : update.status === "Accepted risk" ? "risk_accepted" : risk.status === "Resolved" ? "risk_reopened" : "risk_mitigation_started";
+            recordEvent({
+              id: `risk-status:${id}:${update.status}`,
+              projectId: risk.projectId,
+              category: "Knowledge risks",
+              type,
+              title: `Risk ${update.status.toLowerCase()}`,
+              description: update.notes ?? risk.title,
+              actorId: update.actorId,
+              riskId: id,
+            });
+          }
+        }
+        return next;
+      });
     },
   }), [risks]);
 

@@ -10,6 +10,7 @@ import {
   type Handover,
   type Project,
 } from "./data";
+import { useOptionalTimeline } from "./timeline-store";
 
 type VerificationAnswer = {
   id: string;
@@ -191,6 +192,8 @@ function activity(who: string, text: string): Activity {
 }
 
 export function QuickConnectProvider({ children }: { children: ReactNode }) {
+  const timeline = useOptionalTimeline();
+  const recordEvent = timeline?.recordEvent ?? (() => {});
   const [data, setData] = useState(initialData);
   const [loaded, setLoaded] = useState(false);
   const [storageError, setStorageError] = useState<unknown | null>(null);
@@ -230,10 +233,22 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
         handovers: [newHandover, ...current.handovers],
         activities: [activity(actorId, `created a handover for ${newHandover.project}`), ...current.activities],
       }));
+      recordEvent({
+        id: `handover-created:${newHandover.id}`,
+        projectId: newHandover.projectId,
+        category: "Handover",
+        type: "handover_created",
+        title: "Handover created",
+        description: `${newHandover.project} handover was created.`,
+        actorId,
+        handoverId: newHandover.id,
+      });
     },
     reviewHandover: (id, reviewerId, action, comment) => {
       const trimmedComment = comment.trim();
       if (!trimmedComment) return;
+      const target = data.handovers.find((item) => item.id === id);
+      if (!target || target.status === "Approved" || target.status === "Rejected") return;
       setData((current) => {
         const handover = current.handovers.find((item) => item.id === id);
         if (!handover || handover.status === "Approved" || handover.status === "Rejected") return current;
@@ -247,8 +262,20 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           activities: [activity(reviewerId, activityText), ...current.activities],
         };
       });
+      recordEvent({
+        id: `handover-${action}:${id}`,
+        projectId: target.projectId,
+        category: "Handover",
+        type: action === "changes_requested" ? "handover_changes_requested" : "handover_rejected",
+        title: action === "changes_requested" ? "Handover changes requested" : "Handover rejected",
+        description: trimmedComment,
+        actorId: reviewerId,
+        handoverId: id,
+      });
     },
     resubmitHandover: (id, memberId, knowledge) => {
+      const target = data.handovers.find((item) => item.id === id);
+      if (!target || target.from !== memberId || target.status !== "Changes requested") return;
       setData((current) => {
         const handover = current.handovers.find((item) => item.id === id);
         if (!handover || handover.from !== memberId || handover.status !== "Changes requested") return current;
@@ -264,8 +291,20 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           activities: [activity(memberId, `updated and resubmitted the ${handover.project} handover`), ...current.activities],
         };
       });
+      if (target) recordEvent({
+        id: `handover-resubmitted:${id}:${knowledge.map((item) => item.question).join("|")}`,
+        projectId: target.projectId,
+        category: "Handover",
+        type: "handover_resubmitted",
+        title: "Handover revised and resubmitted",
+        description: `${target.project} handover was updated and resubmitted.`,
+        actorId: memberId,
+        handoverId: id,
+      });
     },
     approveHandover: (id, approvedBy) => {
+      const target = data.handovers.find((item) => item.id === id);
+      if (!target || target.status === "Approved" || target.status === "Rejected") return;
       setData((current) => {
         const handover = current.handovers.find((item) => item.id === id);
         if (!handover || handover.status === "Approved" || handover.status === "Rejected") return current;
@@ -276,6 +315,16 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
           approvals: [...current.approvals, { id: crypto.randomUUID(), handoverId: id, approvedBy, approvedAt: now }],
           activities: [activity(approvedBy, `approved the ${handover.project} handover`), ...current.activities],
         };
+      });
+      if (target) recordEvent({
+        id: `handover-approved:${id}:${approvedBy}`,
+        projectId: target.projectId,
+        category: "Handover",
+        type: "handover_approved",
+        title: "Handover approved",
+        description: `${target.project} handover was approved.`,
+        actorId: approvedBy,
+        handoverId: id,
       });
     },
     submitAnswer: (answer) => {
@@ -371,7 +420,7 @@ export function QuickConnectProvider({ children }: { children: ReactNode }) {
         };
       });
     },
-  }), [data]);
+  }), [data, recordEvent]);
 
   return <QuickConnectContext.Provider value={api}>{children}</QuickConnectContext.Provider>;
 }

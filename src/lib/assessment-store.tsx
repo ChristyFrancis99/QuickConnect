@@ -19,6 +19,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Handover } from "./data";
+import { useOptionalTimeline } from "./timeline-store";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -396,11 +397,11 @@ export function loadAssessmentData(storage?: Storage | null): AssessmentStoreDat
 
 export interface AssessmentApi extends AssessmentStoreData {
   /** Create or return an existing assessment for a given handover + person */
-  startAssessment: (handover: Handover, personId: string) => Assessment;
+  startAssessment: (handover: Handover, personId: string, actorId?: string) => Assessment;
   /** Save an answer (called on each selection, not just at submit time) */
   saveAnswer: (assessmentId: string, answer: AssessmentAnswer) => void;
   /** Submit the full assessment and calculate its score */
-  submitAssessment: (assessmentId: string) => void;
+  submitAssessment: (assessmentId: string, actorId?: string) => void;
   /** Manager: accept or flag a descriptive answer */
   reviewAssessmentAnswer: (
     assessmentId: string,
@@ -416,6 +417,8 @@ export interface AssessmentApi extends AssessmentStoreData {
 const AssessmentContext = createContext<AssessmentApi | null>(null);
 
 export function AssessmentProvider({ children }: { children: ReactNode }) {
+  const timeline = useOptionalTimeline();
+  const recordEvent = timeline?.recordEvent ?? (() => {});
   const [data, setData] = useState<AssessmentStoreData>({
     assessments: [],
     reviews: [],
@@ -439,7 +442,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
   const api = useMemo<AssessmentApi>(() => ({
     ...data,
 
-    startAssessment: (handover, personId) => {
+    startAssessment: (handover, personId, actorId = personId) => {
       // Return existing assessment if one already exists
       const existing = data.assessments.find(
         (a) => a.handoverId === handover.id && a.personId === personId
@@ -464,6 +467,17 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         ...current,
         assessments: [...current.assessments, newAssessment],
       }));
+      recordEvent({
+        id: `assessment-started:${newAssessment.id}`,
+        projectId: handover.projectId,
+        category: "Knowledge verification",
+        type: "assessment_started",
+        title: "Assessment started",
+        description: `${handover.project} assessment was started.`,
+        actorId,
+        handoverId: handover.id,
+        assessmentId: newAssessment.id,
+      });
 
       return newAssessment;
     },
@@ -493,7 +507,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       });
     },
 
-    submitAssessment: (assessmentId) => {
+    submitAssessment: (assessmentId, actorId = "system") => {
       setData((current) => {
         const idx = current.assessments.findIndex((a) => a.id === assessmentId);
         if (idx === -1) return current;
@@ -531,6 +545,18 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         const updated = [...current.assessments];
         updated[idx] = updatedAssessment;
         return { ...current, assessments: updated };
+      });
+      const submitted = data.assessments.find((item) => item.id === assessmentId);
+      if (submitted) recordEvent({
+        id: `assessment-submitted:${assessmentId}`,
+        projectId: submitted.projectId,
+        category: "Knowledge verification",
+        type: "assessment_submitted",
+        title: "Assessment submitted",
+        description: "An incoming member submitted an assessment for review.",
+        actorId,
+        handoverId: submitted.handoverId,
+        assessmentId,
       });
     },
 
@@ -592,6 +618,18 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
         return { ...current, assessments: updated, reviews: newReviews };
       });
+      const reviewed = data.assessments.find((item) => item.id === assessmentId);
+      if (reviewed) recordEvent({
+        id: `assessment-review:${assessmentId}:${questionId}:${action}`,
+        projectId: reviewed.projectId,
+        category: "Knowledge verification",
+        type: action === "accepted" ? "manager_review_completed" : "clarification_requested",
+        title: action === "accepted" ? "Manager review completed" : "Clarification requested",
+        description: comment.trim(),
+        actorId: reviewerId,
+        handoverId: reviewed.handoverId,
+        assessmentId,
+      });
     },
 
     getAssessmentStatus: (assessmentId) => {
@@ -599,7 +637,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       if (!assessment) return "not_started";
       return deriveAssessmentStatus(assessment, data.reviews);
     },
-  }), [data]);
+  }), [data, recordEvent]);
 
   return (
     <AssessmentContext.Provider value={api}>
@@ -612,6 +650,10 @@ export function useAssessment() {
   const ctx = useContext(AssessmentContext);
   if (!ctx) throw new Error("useAssessment must be used within AssessmentProvider");
   return ctx;
+}
+
+export function useOptionalAssessment() {
+  return useContext(AssessmentContext);
 }
 
 // ---------------------------------------------------------------------------

@@ -178,6 +178,7 @@ export const navItems = [
   { slug: "verification", label: "Knowledge Verification" },
   { slug: "readiness", label: "Readiness Reports" },
   { slug: "risk-radar", label: "Knowledge Risk Radar" },
+  { slug: "timeline", label: "Continuity Timeline" },
   { slug: "activity", label: "Activity & History" },
   { slug: "settings", label: "Settings" },
 ] as const;

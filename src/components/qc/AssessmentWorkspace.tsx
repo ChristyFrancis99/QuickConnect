@@ -71,7 +71,7 @@ export function AssessmentWorkspace({
 
   useEffect(() => {
     if (assessmentId) return;
-    const created = startAssessment(handover, personId);
+    const created = startAssessment(handover, personId, personId);
     setAssessmentId(created.id);
   }, [assessmentId, handover, personId, startAssessment]);
 
@@ -197,7 +197,7 @@ export function AssessmentWorkspace({
     if (isSubmitting || isSubmitted || !canSubmit) return;
     setIsSubmitting(true);
     setTimeout(() => {
-      submitAssessment(assessment.id);
+      submitAssessment(assessment.id, personId);
       setIsSubmitting(false);
       setShowResults(true);
       toast.success("Assessment submitted. Results are ready to view.");

@@ -17,14 +17,14 @@ import { ActivityPanel } from "./Dashboard";
 
 const roleNavigation: Record<string, string[]> = {
   "Outgoing Member": ["dashboard", "projects", "handovers", "activity"],
-  "Incoming Member": ["dashboard", "projects", "verification", "activity"],
-  "Project Manager": ["dashboard", "projects", "team", "handovers", "verification", "readiness", "risk-radar", "activity"],
+  "Incoming Member": ["dashboard", "projects", "verification", "timeline", "activity"],
+  "Project Manager": ["dashboard", "projects", "team", "handovers", "verification", "readiness", "risk-radar", "timeline", "activity"],
   "Organisation Admin": navItems.map((item) => item.slug),
 };
 
 const icons = {
   dashboard: LayoutDashboard, projects: FolderKanban, team: Users, sources: Database, analysis: BrainCircuit,
-  handovers: FileText, verification: ShieldCheck, readiness: BarChart3, "risk-radar": ShieldAlert, activity: Activity, settings: Settings,
+  handovers: FileText, verification: ShieldCheck, readiness: BarChart3, "risk-radar": ShieldAlert, timeline: Activity, activity: Activity, settings: Settings,
 };
 
 function Logo() {
